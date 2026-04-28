@@ -5,13 +5,10 @@
       - id: isort
         name: isort (python)
         args: ["--profile", "black", "--filter-files"]
-  - repo: https://github.com/astral-sh/ruff-pre-commit # Linter and formatter
-    # Ruff version.
-    rev: v0.15.12
+  - repo: local
     hooks:
-      # Run the linter.
-      - id: ruff-check
-        args: [ --fix , "--config=pyproject.toml"]
-      # Run the formatter.
-      - id: ruff-format
-        args: ["--config=pyproject.toml"]
+      - id: ruff
+        name: ruff
+        entry: uv run ruff check
+        language: system
+        types: [python]

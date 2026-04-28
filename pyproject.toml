@@ -10,6 +10,7 @@ requires-python = ">=3.12"
 dependencies = [
     "photonforge>=1.3.2",
     "pre-commit>=4.6.0",
+    "ruff>=0.15.12",
 ]
 
 [build-system]
@@ -23,6 +24,7 @@ line-length = 100
 
 [tool.ruff.lint]
 extend-select = [
+    "D",   # docstring checks
     "E",   # pycodestyle errors
     "F",   # pyflakes
     "B",   # bugbear

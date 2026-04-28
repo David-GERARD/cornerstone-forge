@@ -1,0 +1,4 @@
+site_name: Cornerstone Forge Documentation
+
+nav:
+  - index.md

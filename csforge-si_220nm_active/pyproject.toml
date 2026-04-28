@@ -1,0 +1,14 @@
+[project]
+name = "csforge-si_220nm_active"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "David-GERARD", email = "david.gerard.23@ucl.ac.uk" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["uv_build>=0.11.7,<0.12.0"]
+build-backend = "uv_build"

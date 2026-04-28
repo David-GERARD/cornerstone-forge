@@ -2,6 +2,13 @@ version = 1
 revision = 3
 requires-python = ">=3.12"
 
+[manifest]
+members = [
+    "csforge-si-220nm-active",
+    "csforge-si-220nm-passive",
+    "csforge-workspace",
+]
+
 [[package]]
 name = "annotated-doc"
 version = "0.0.4"
@@ -261,9 +268,19 @@ wheels = [
 ]
 
 [[package]]
-name = "cornerstone-forge"
+name = "csforge-si-220nm-active"
 version = "0.1.0"
-source = { editable = "." }
+source = { editable = "csforge-si_220nm_active" }
+
+[[package]]
+name = "csforge-si-220nm-passive"
+version = "0.1.0"
+source = { editable = "csforge-si_220nm_passive" }
+
+[[package]]
+name = "csforge-workspace"
+version = "0.1.0"
+source = { virtual = "." }
 dependencies = [
     { name = "photonforge" },
 ]

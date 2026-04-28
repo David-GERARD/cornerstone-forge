@@ -1,5 +1,5 @@
 [project]
-name = "cornerstone-forge"
+name = "csforge-workspace"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -10,13 +10,26 @@ requires-python = ">=3.12"
 dependencies = [
     "photonforge>=1.3.2",
 ]
-
 [dependency-groups]
 dev = [
     "mkdocs>=1.6.1",
     "pre-commit>=4.6.0",
     "ruff>=0.15.12",
 ]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+csforge-si_220nm_active = { workspace = true }
+csforge-si_220nm_passive = { workspace = true }
+
+[tool.uv.workspace]
+members = [
+    "csforge-si_220nm_active",
+    "csforge-si_220nm_passive",
+]
+
 
 [build-system]
 requires = ["uv_build>=0.11.7,<0.12.0"]
@@ -57,3 +70,4 @@ extend-ignore = [
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+

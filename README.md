@@ -12,6 +12,9 @@ PhotonForge implementation of [Cornerstone's PDK](https://github.com/cornerstone
     uv run pre-commit install # Setup pre-commit hooks to enforce code quality
 ```
 
+[!TIP]
+> This project uses [`uv` workspaces](https://docs.astral.sh/uv/concepts/projects/workspaces/) to jointly manage the dependencies of the different technology packages.
+
 ## Building the documentation locally
 
 After setup, run:

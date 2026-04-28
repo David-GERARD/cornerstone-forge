@@ -1,2 +1,2 @@
 # cornerstone-forge
-PhotonForge PDK for Cornerstone
+PhotonForge implementation of [Cornerstone's PDK](https://github.com/cornerstone-uos/cornerstone-pdk).

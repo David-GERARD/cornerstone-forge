@@ -9,6 +9,6 @@
     hooks:
       - id: ruff
         name: ruff
-        entry: uv run ruff check
+        entry: uv run ruff check --fix
         language: system
         types: [python]

@@ -93,3 +93,6 @@ _layers = {
         pattern = ""
     ),
 }
+
+if __name__ == "__main__":
+    print(pf.LayerTable(_layers))

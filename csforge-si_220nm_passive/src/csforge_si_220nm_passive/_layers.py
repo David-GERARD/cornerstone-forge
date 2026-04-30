@@ -17,7 +17,7 @@ _layers = {
         layer=(60, 0),
         description=(
             "[Si_Etch0_EBL_DF_94nm] EBL-defined grating couplers."
-            "Layer will be etched. For gaps > 0.35, there is no max feature size."
+            "Dark-field: layer will be etched. For gaps > 0.35, there is no max feature size."
         ),
         color="#ff008050",
         pattern=""
@@ -26,7 +26,7 @@ _layers = {
         layer=(6, 0),
         description=(
             "[Si_Etch1_DUV_DF_70nm] DUV-defined grating couplers. "
-            "Layer will be etched."
+            "Dark-field: layer will be etched."
         ),
         color="#ffcc78ff",
         pattern=""
@@ -35,7 +35,7 @@ _layers = {
         layer=(3, 0),
         description=(
             "[Si_Etch2_LF_120nm] Waveguide layer, defines both strip and rib. "
-            "Layer will be protected."
+            "Light-field: layer will be protected."
         ),
         color="#ffff80a8",
         pattern=""
@@ -44,7 +44,7 @@ _layers = {
         layer=(4, 0),
         description=(
             "[Si_Etch2_DF_120nm] Waveguide layer, defines both strip and rib. "
-            "Layer will be etched."
+            "Dark-field: layer will be etched."
         ),
         color="#ff8183ff",
         pattern=""
@@ -53,7 +53,7 @@ _layers = {
         layer=(5, 0),
         description=(
             "[Si_Etch3_LF_100nm_to_BOX] Rib protect layer. "
-            "Layer will be protected."
+            "Light-field: layer will be protected."
         ),
         color="#ff80a8ff",
         pattern=""
@@ -62,7 +62,7 @@ _layers = {
         layer=(39, 0),
         description=(
             "[Heat_Fil_LF] Heater filaments (light). "
-            "Layer will become metal."
+            "Light-field: layer will become metal."
         ),
         color="#ff9580ff",
         pattern=""
@@ -71,7 +71,7 @@ _layers = {
         layer=(41, 0),
         description=(
             "[Heat_CP_LF] Heater contact pads (light). "
-            "Layer will become metal."
+            "Light-field: layer will become metal."
         ),
         color="#ff80a8ff",
         pattern=""
@@ -87,7 +87,9 @@ _layers = {
     "Label_Etch_DF": pf.LayerSpec(
         layer = (100, 0),
         description = (
-            "[Label_Etch_DF] Labels (dark), will be etched, will not be checked in DRC."
+            "[Label_Etch_DF] Labels (dark), "
+            "Dark-field: layer will be etched"
+            "Will not be checked in DRC."
         ),
         color = "#ff8000ff",
         pattern = ""

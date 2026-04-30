@@ -12,7 +12,7 @@ Layers colors:
 """
 import photonforge as pf
 
-_layers = {
+_layer_specs = {
     "grating_ebl": pf.LayerSpec(
         layer=(60, 0),
         description=(
@@ -97,4 +97,4 @@ _layers = {
 }
 
 if __name__ == "__main__":
-    print(pf.LayerTable(_layers))
+    print(pf.LayerTable(_layer_specs))

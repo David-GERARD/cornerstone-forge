@@ -1,13 +1,16 @@
 """This file contains the parametric technology definition for the SI 220nm passive PDK."""
 
 import photonforge as pf
-from _layers import _layers
+from _layers import _layer_specs
 
 
 @pf.parametric_technology
-def csforge_si_220nm_pdk()-> pf.Technology:
+def csforge_si_220nm_pdk(
+)-> pf.Technology:
     """Defines the parametric technology for Cornerstone's Si 220nm passive PDK."""
-    layers = {k: v.copy() for k, v in _layers.items()}
+    # Load layers from the _layers module and create a copy for the technology definition
+    layers = {k: v.copy() for k, v in _layer_specs.items()}
+
 
     technology = pf.Technology(
         name="csforge_si_220nm_passive",

@@ -1,14 +1,21 @@
-  repos:
-  - repo: https://github.com/pycqa/isort # Sorts package imports in python files
+repos:
+  - repo: https://github.com/pycqa/isort  # Sorts package imports in python files
     rev: 5.12.0
     hooks:
       - id: isort
         name: isort (python)
         args: ["--profile", "black", "--filter-files"]
+
   - repo: local
     hooks:
-      - id: ruff
-        name: ruff
-        entry: uv run ruff check --fix
+      - id: ruff-check
+        name: ruff check
+        entry: uv run ruff check . --fix
+        language: system
+        types: [python]
+
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format .
         language: system
         types: [python]

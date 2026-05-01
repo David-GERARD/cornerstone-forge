@@ -13,16 +13,19 @@ _masks_layers = {
     "Label_Etch_DF": pf.MaskSpec(_layer_specs["Label_Etch_DF"].layer),
 }
 
+_masks = {}
+
 # Passive layers
-_masks = {
-    "substrate": -pf.MaskSpec((0, 0)),
-    "waveguide": (_masks_layers["wg_lf"] - _masks_layers["wg_df"])
-    * (-_masks_layers["grating_ebl"] - _masks_layers["grating_duv"]),
-    "ebeam_gratings": (_masks_layers["wg_lf"] + -_masks_layers["wg_df"])
-    * _masks_layers["grating_ebl"],
-    "duv_gratings": (_masks_layers["wg_lf"] + -_masks_layers["wg_df"])
-    * _masks_layers["grating_duv"],
-}
+_masks["substrate"] = -pf.MaskSpec((0, 0))
+_masks["waveguide"] = (_masks_layers["wg_lf"] - _masks_layers["wg_df"]) * (
+    -_masks_layers["grating_ebl"] - _masks_layers["grating_duv"]
+)
+_masks["ebeam_gratings"] = (_masks_layers["wg_lf"] + -_masks_layers["wg_df"]) * _masks_layers[
+    "grating_ebl"
+]
+_masks["duv_gratings"] = (_masks_layers["wg_lf"] + -_masks_layers["wg_df"]) * _masks_layers[
+    "grating_duv"
+]
 _masks["rib_slab"] = _masks_layers["rib_slab"] * -(
     _masks["waveguide"] + _masks["ebeam_gratings"] + _masks["duv_gratings"]
 )

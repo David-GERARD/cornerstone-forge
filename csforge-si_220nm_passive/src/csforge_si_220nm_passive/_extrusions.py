@@ -4,6 +4,8 @@ from _layers import _layer_specs
 from data.materials import _load_material_data
 
 # DEFAULT MEDIA
+
+# Waveguide and substrate media
 medium_si, medium_sio2 = _load_material_data()
 _media = {
     "sio2": {
@@ -13,6 +15,7 @@ _media = {
     "si": {"optical": medium_si, "electrical": td.Medium(permittivity=12.3, name="si")},
 }
 
+# Heaters media
 # Taken from https://www.flexcompute.com/tidy3d/examples/notebooks/ThermallyTunedRingResonator/
 TiN_k = 28e-6  # TiN thermal conductivity W/(um*K)
 TiN_s = 598  # TiN specific heat capacity, J / (Kg * K)
@@ -29,6 +32,10 @@ _media["tin"] = td.MultiPhysicsMedium(
         name="tin",
     ),
 )
+
+# Contact pads media (Aluminum as in cspdk https://github.com/gdsfactory/cspdk/blob/main/cspdk/si220/cband/tech.py)
+_media["al"] = td.material_library["Al"]["Rakic1995"]
+
 
 # MASKS FOR EXTRUSIONS
 _masks_layers = {
@@ -59,21 +66,81 @@ _masks = {
     "box": -pf.MaskSpec((0, 0)),
     "waveguide": (_masks_layers["wg_lf"] - _masks_layers["wg_df"])
     * (-_masks_layers["grating_ebl"] - _masks_layers["grating_duv"]),
-    "rib_slab": _masks_layers["rib_slab"],
     "ebeam_gratings": (_masks_layers["wg_lf"] + -_masks_layers["wg_df"])
     * _masks_layers["grating_ebl"],
     "duv_gratings": (_masks_layers["wg_lf"] + -_masks_layers["wg_df"])
     * _masks_layers["grating_duv"],
 }
+_masks["rib_slab"] = _masks_layers["rib_slab"] * -(
+    _masks["waveguide"] + _masks["ebeam_gratings"] + _masks["duv_gratings"]
+)
+
+# Heaters
 _masks["heater_fil_waveguide"] = _masks_layers["heater_fil"] * _masks["waveguide"]
-_masks["heater_fil_rib_slab"] = _masks_layers["heater_fil"] * _masks["rib_slab"]
 _masks["heater_fil_ebeam_gratings"] = _masks_layers["heater_fil"] * _masks["ebeam_gratings"]
 _masks["heater_fil_duv_gratings"] = _masks_layers["heater_fil"] * _masks["duv_gratings"]
+_masks["heater_fil_rib_slab"] = _masks_layers["heater_fil"] * _masks["rib_slab"]
 _masks["heater_fil_box"] = _masks_layers["heater_fil"] - (
     _masks["heater_fil_waveguide"]
     + _masks["heater_fil_rib_slab"]
     + _masks["heater_fil_ebeam_gratings"]
     + _masks["heater_fil_duv_gratings"]
+)
+# Contact pads, no heaters
+_masks["contact_pad_waveguide"] = (
+    _masks_layers["contact_pad"] * _masks["waveguide"] * (-_masks_layers["heater_fil"])
+)
+_masks["contact_pad_rib_slab"] = (
+    _masks_layers["contact_pad"] * _masks["rib_slab"] * (-_masks_layers["heater_fil"])
+)
+_masks["contact_pad_ebeam_gratings"] = (
+    _masks_layers["contact_pad"] * _masks["ebeam_gratings"] * (-_masks_layers["heater_fil"])
+)
+_masks["contact_pad_duv_gratings"] = (
+    _masks_layers["contact_pad"] * _masks["duv_gratings"] * (-_masks_layers["heater_fil"])
+)
+_masks["contact_pad_box"] = _masks_layers["contact_pad"] - (
+    _masks["contact_pad_waveguide"]
+    + _masks["contact_pad_rib_slab"]
+    + _masks["contact_pad_ebeam_gratings"]
+    + _masks["contact_pad_duv_gratings"]
+    + _masks_layers["heater_fil"]
+)
+mask_contact_pads_no_heaters = (
+    _masks["contact_pad_waveguide"]
+    + _masks["contact_pad_rib_slab"]
+    + _masks["contact_pad_ebeam_gratings"]
+    + _masks["contact_pad_duv_gratings"]
+    + _masks["contact_pad_box"]
+)
+
+# Contact pads, heaters
+_masks["contact_pad_heater_fil_waveguide"] = (
+    _masks_layers["contact_pad"]
+    * _masks["waveguide"]
+    * _masks_layers["heater_fil"]
+    * -mask_contact_pads_no_heaters
+)
+_masks["contact_pad_heater_fil_rib_slab"] = (
+    _masks_layers["contact_pad"]
+    * _masks["rib_slab"]
+    * _masks_layers["heater_fil"]
+    * -mask_contact_pads_no_heaters
+)
+_masks["contact_pad_heater_fil_ebeam_gratings"] = (
+    _masks_layers["contact_pad"]
+    * _masks["ebeam_gratings"]
+    * _masks_layers["heater_fil"]
+    * -mask_contact_pads_no_heaters
+)
+_masks["contact_pad_heater_fil_duv_gratings"] = (
+    _masks_layers["contact_pad"]
+    * _masks["duv_gratings"]
+    * _masks_layers["heater_fil"]
+    * -mask_contact_pads_no_heaters
+)
+_masks["contact_pad_heater_fil_box"] = (
+    _masks_layers["contact_pad"] * _masks["heater_fil_box"] * -mask_contact_pads_no_heaters
 )
 
 _thicknesses = {

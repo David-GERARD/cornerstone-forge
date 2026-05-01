@@ -90,6 +90,112 @@ def csforge_si_220nm_pdk(
         ),
     ]
 
+    # Contact pad extrusions (no heaters)
+    extrusion_specs += [
+        pf.ExtrusionSpec(
+            mask_spec=masks["contact_pad_waveguide"],
+            medium=media["al"],
+            limits=(
+                thicknesses["waveguide"] + thicknesses["tox"],
+                thicknesses["waveguide"] + thicknesses["tox"] + thicknesses["contact_pad"],
+            ),
+            sidewall_angle=0.0,
+        ),
+        pf.ExtrusionSpec(
+            mask_spec=masks["contact_pad_rib_slab"],
+            medium=media["al"],
+            limits=(
+                thicknesses["rib_slab"] + thicknesses["tox"],
+                thicknesses["rib_slab"] + thicknesses["tox"] + thicknesses["contact_pad"],
+            ),
+            sidewall_angle=0.0,
+        ),
+        pf.ExtrusionSpec(
+            mask_spec=masks["contact_pad_ebeam_gratings"],
+            medium=media["al"],
+            limits=(
+                thicknesses["ebeam_gratings"] + thicknesses["tox"],
+                thicknesses["ebeam_gratings"] + thicknesses["tox"] + thicknesses["contact_pad"],
+            ),
+            sidewall_angle=0.0,
+        ),
+        pf.ExtrusionSpec(
+            mask_spec=masks["contact_pad_duv_gratings"],
+            medium=media["al"],
+            limits=(
+                thicknesses["duv_gratings"] + thicknesses["tox"],
+                thicknesses["duv_gratings"] + thicknesses["tox"] + thicknesses["contact_pad"],
+            ),
+            sidewall_angle=0.0,
+        ),
+        pf.ExtrusionSpec(
+            mask_spec=masks["contact_pad_box"],
+            medium=media["al"],
+            limits=(thicknesses["tox"], thicknesses["tox"] + thicknesses["contact_pad"]),
+            sidewall_angle=0.0,
+        ),
+    ]
+    # Contact pad extrusions (with heaters)
+    extrusion_specs += [
+        pf.ExtrusionSpec(
+            mask_spec=masks["contact_pad_heater_fil_waveguide"],
+            medium=media["al"],
+            limits=(
+                thicknesses["waveguide"] + thicknesses["tox"] + thicknesses["heater_fil"],
+                thicknesses["waveguide"]
+                + thicknesses["tox"]
+                + thicknesses["heater_fil"]
+                + thicknesses["contact_pad"],
+            ),
+            sidewall_angle=0.0,
+        ),
+        pf.ExtrusionSpec(
+            mask_spec=masks["contact_pad_heater_fil_rib_slab"],
+            medium=media["al"],
+            limits=(
+                thicknesses["rib_slab"] + thicknesses["tox"] + thicknesses["heater_fil"],
+                thicknesses["rib_slab"]
+                + thicknesses["tox"]
+                + thicknesses["heater_fil"]
+                + thicknesses["contact_pad"],
+            ),
+            sidewall_angle=0.0,
+        ),
+        pf.ExtrusionSpec(
+            mask_spec=masks["contact_pad_heater_fil_ebeam_gratings"],
+            medium=media["al"],
+            limits=(
+                thicknesses["ebeam_gratings"] + thicknesses["tox"] + thicknesses["heater_fil"],
+                thicknesses["ebeam_gratings"]
+                + thicknesses["tox"]
+                + thicknesses["heater_fil"]
+                + thicknesses["contact_pad"],
+            ),
+            sidewall_angle=0.0,
+        ),
+        pf.ExtrusionSpec(
+            mask_spec=masks["contact_pad_heater_fil_duv_gratings"],
+            medium=media["al"],
+            limits=(
+                thicknesses["duv_gratings"] + thicknesses["tox"] + thicknesses["heater_fil"],
+                thicknesses["duv_gratings"]
+                + thicknesses["tox"]
+                + thicknesses["heater_fil"]
+                + thicknesses["contact_pad"],
+            ),
+            sidewall_angle=0.0,
+        ),
+        pf.ExtrusionSpec(
+            mask_spec=masks["contact_pad_heater_fil_box"],
+            medium=media["al"],
+            limits=(
+                thicknesses["tox"] + thicknesses["heater_fil"],
+                thicknesses["tox"] + thicknesses["heater_fil"] + thicknesses["contact_pad"],
+            ),
+            sidewall_angle=0.0,
+        ),
+    ]
+
     if include_substrate:
         extrusion_specs.append(
             pf.ExtrusionSpec(
@@ -152,9 +258,12 @@ if __name__ == "__main__":
         pf.Rectangle((2.25, -2), (2.75, 2)),
     )
 
-    # Heater test
+    # Heater and contact pad test
     c.add(
         "heater_fil",
+        pf.Rectangle((-2.5, -2), (0, 2)),
+        pf.Rectangle((2, -2), (3, 2)),
+        "contact_pad",
         pf.Rectangle((-2.5, -2), (3, 2)),
     )
     # viewer(c)

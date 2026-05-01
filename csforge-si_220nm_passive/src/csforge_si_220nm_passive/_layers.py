@@ -10,6 +10,7 @@ Layers colors:
     - Source: https://github.com/cornerstone-uos/cornerstone-pdk/blob/main/Si_220nm_passive/layers.lyp
 
 """
+
 import photonforge as pf
 
 _layer_specs = {
@@ -20,16 +21,15 @@ _layer_specs = {
             "Dark-field: layer will be etched. For gaps > 0.35, there is no max feature size."
         ),
         color="#ff008050",
-        pattern=""
+        pattern="",
     ),
     "grating_duv": pf.LayerSpec(
         layer=(6, 0),
         description=(
-            "[Si_Etch1_DUV_DF_70nm] DUV-defined grating couplers. "
-            "Dark-field: layer will be etched."
+            "[Si_Etch1_DUV_DF_70nm] DUV-defined grating couplers. Dark-field: layer will be etched."
         ),
         color="#ffcc78ff",
-        pattern=""
+        pattern="",
     ),
     "wg_lf": pf.LayerSpec(
         layer=(3, 0),
@@ -38,7 +38,7 @@ _layer_specs = {
             "Light-field: layer will be protected."
         ),
         color="#ffff80a8",
-        pattern=""
+        pattern="",
     ),
     "wg_df": pf.LayerSpec(
         layer=(4, 0),
@@ -47,52 +47,44 @@ _layer_specs = {
             "Dark-field: layer will be etched."
         ),
         color="#ff8183ff",
-        pattern=""
+        pattern="",
     ),
     "rib_slab": pf.LayerSpec(
         layer=(5, 0),
         description=(
-            "[Si_Etch3_LF_100nm_to_BOX] Rib protect layer. "
-            "Light-field: layer will be protected."
+            "[Si_Etch3_LF_100nm_to_BOX] Rib protect layer. Light-field: layer will be protected."
         ),
         color="#ff80a8ff",
-        pattern=""
+        pattern="",
     ),
     "heater_fil": pf.LayerSpec(
         layer=(39, 0),
         description=(
-            "[Heat_Fil_LF] Heater filaments (light). "
-            "Light-field: layer will become metal."
+            "[Heat_Fil_LF] Heater filaments (light). Light-field: layer will become metal."
         ),
         color="#ff9580ff",
-        pattern=""
+        pattern="",
     ),
     "contact_pad": pf.LayerSpec(
         layer=(41, 0),
         description=(
-            "[Heat_CP_LF] Heater contact pads (light). "
-            "Light-field: layer will become metal."
+            "[Heat_CP_LF] Heater contact pads (light). Light-field: layer will become metal."
         ),
         color="#ff80a8ff",
-        pattern=""
+        pattern="",
     ),
     "FloorPlan": pf.LayerSpec(
-        layer=(99, 0),
-        description=(
-            "[FloorPlan] Cell outline"
-        ),
-        color="#fff3ff80",
-        pattern=""
+        layer=(99, 0), description=("[FloorPlan] Cell outline"), color="#fff3ff80", pattern=""
     ),
     "Label_Etch_DF": pf.LayerSpec(
-        layer = (100, 0),
-        description = (
+        layer=(100, 0),
+        description=(
             "[Label_Etch_DF] Labels (dark), "
             "Dark-field: layer will be etched"
             "Will not be checked in DRC."
         ),
-        color = "#ff8000ff",
-        pattern = ""
+        color="#ff8000ff",
+        pattern="",
     ),
 }
 

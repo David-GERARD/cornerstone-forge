@@ -25,9 +25,21 @@ def csforge_si_220nm_pdk(
             sidewall_angle=0.0,
         ),
         pf.ExtrusionSpec(
+            mask_spec=masks["waveguide"],
+            medium=media["sio2"],
+            limits=(thicknesses["waveguide"], thicknesses["waveguide"] + thicknesses["tox"]),
+            sidewall_angle=0.0,
+        ),
+        pf.ExtrusionSpec(
             mask_spec=masks["rib_slab"],
             medium=media["si"],
             limits=(0, thicknesses["rib_slab"]),
+            sidewall_angle=0.0,
+        ),
+        pf.ExtrusionSpec(
+            mask_spec=masks["rib_slab"],
+            medium=media["sio2"],
+            limits=(thicknesses["rib_slab"], thicknesses["rib_slab"] + thicknesses["tox"]),
             sidewall_angle=0.0,
         ),
         pf.ExtrusionSpec(
@@ -37,9 +49,35 @@ def csforge_si_220nm_pdk(
             sidewall_angle=0.0,
         ),
         pf.ExtrusionSpec(
+            mask_spec=masks["ebeam_gratings"],
+            medium=media["sio2"],
+            limits=(
+                thicknesses["ebeam_gratings"],
+                thicknesses["ebeam_gratings"] + thicknesses["tox"],
+            ),
+            sidewall_angle=0.0,
+        ),
+        pf.ExtrusionSpec(
             mask_spec=masks["duv_gratings"],
             medium=media["si"],
             limits=(0, thicknesses["duv_gratings"]),
+            sidewall_angle=0.0,
+        ),
+        pf.ExtrusionSpec(
+            mask_spec=masks["duv_gratings"],
+            medium=media["sio2"],
+            limits=(thicknesses["duv_gratings"], thicknesses["duv_gratings"] + thicknesses["tox"]),
+            sidewall_angle=0.0,
+        ),
+        pf.ExtrusionSpec(
+            mask_spec=masks["box"],
+            medium=media["sio2"],
+            limits=(0, thicknesses["tox"]),
+        ),
+        pf.ExtrusionSpec(
+            mask_spec=masks["substrate"],
+            medium=media["sio2"],
+            limits=(-thicknesses["box"], 0),
             sidewall_angle=0.0,
         ),
     ]
@@ -197,20 +235,14 @@ def csforge_si_220nm_pdk(
     ]
 
     if include_substrate:
-        extrusion_specs.append(
+        extrusion_specs += [
             pf.ExtrusionSpec(
                 mask_spec=masks["substrate"],
-                medium=media["sio2"],
-                limits=(-float("inf"), -thicknesses["box"]),
+                medium=media["si"],
+                limits=(-thicknesses["box"] * 2, -thicknesses["box"]),
                 sidewall_angle=0.0,
             ),
-            pf.ExtrusionSpec(
-                mask_spec=masks["box"],
-                medium=media["sio2"],
-                limits=(-thicknesses["box"], 0),
-                sidewall_angle=0.0,
-            ),
-        )
+        ]
 
     technology = pf.Technology(
         name="csforge_si_220nm_passive",
@@ -218,7 +250,7 @@ def csforge_si_220nm_pdk(
         layers=layers,
         extrusion_specs=extrusion_specs,
         ports={},
-        background_medium=media["sio2"],
+        background_medium=media["air"],
         connections={},
     )
     return technology
@@ -228,7 +260,7 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     # viewer = LiveViewer()
-    c = pf.Component("test_component", technology=csforge_si_220nm_pdk())
+    c = pf.Component("test_component", technology=csforge_si_220nm_pdk(include_substrate=False))
 
     # Hole in waveguide test
     c.add(

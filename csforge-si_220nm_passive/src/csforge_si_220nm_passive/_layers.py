@@ -1,13 +1,23 @@
-"""This module defines the layers used in the csforge_si_220nm_passive process.
+"""This module declares the layers, media, and thicknesses for the Si_220nm_passive PDK.
 
-Layers info:
+Layers scpecs:
     - Source: https://github.com/cornerstone-uos/cornerstone-pdk/blob/main/Si_220nm_passive/process_overview.yaml
     - Alias is used as a key for the layer. with the full name in the description for clarity.
     - The layer number and datatype are defined in the layer tuple.
     - The description provides the layer full name and its purpose.
+    - Colors from https://github.com/cornerstone-uos/cornerstone-pdk/blob/main/Si_220nm_passive/layers.lyp
 
-Layers colors:
-    - Source: https://github.com/cornerstone-uos/cornerstone-pdk/blob/main/Si_220nm_passive/layers.lyp
+Connections:
+    - Heater filaments and contact pads are connected.
+
+Media:
+    - Optical dispersive media for Si and SiO2 are loaded from PDK data.
+    - Electrical media for Si and SiO2 are defined with typical permittivity values.
+    - TiN media is defined for heaters, with properties taken from literature.
+    - Aluminum media is defined for contact pads, using Tidy3D's material library.
+
+Thicknesses:
+    - Source: https://github.com/cornerstone-uos/cornerstone-pdk/blob/main/Si_220nm_passive/process_overview.yaml
 
 """
 
@@ -92,6 +102,12 @@ _layer_specs = {
         pattern="",
     ),
 }
+
+###############
+# ELECTRICAL CONNECTIONS
+###############
+
+_connections = [(_layer_specs["heater_fil"].layer, _layer_specs["contact_pad"].layer)]
 
 ###############
 # MEDIA

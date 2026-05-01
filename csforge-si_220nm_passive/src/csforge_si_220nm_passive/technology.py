@@ -3,7 +3,7 @@
 import photonforge as pf
 import tidy3d as td
 from _extrusions import _masks
-from _layers import _layer_specs, _media, _thicknesses
+from _layers import _connections, _layer_specs, _media, _thicknesses
 from _ports import _ports
 
 
@@ -252,7 +252,7 @@ def csforge_si_220nm_pdk(
         extrusion_specs=extrusion_specs,
         ports=_ports,
         background_medium=media["air"],
-        connections={},
+        connections=_connections,
     )
     return technology
 
@@ -339,13 +339,13 @@ if __name__ == "__main__":
 
     plt.show()
     print(tech.ports)
-    pf.config.default_mesh_refinement = 30
+    # pf.config.default_mesh_refinement = 30
 
-    freqs = [pf.C_0 / 1.55]
+    # freqs = [pf.C_0 / 1.55]
 
-    mode_solver = pf.port_modes("rib_1550nm_TE", freqs)
-    mode_solver.plot_field("E", mode_index=0, f=freqs[0], robust=False)
+    # mode_solver = pf.port_modes("rib_1550nm_TE", freqs)
+    # mode_solver.plot_field("E", mode_index=0, f=freqs[0], robust=False)
 
-    plt.show()
+    # plt.show()
 
-    print(mode_solver.data.to_dataframe())
+    # print(mode_solver.data.to_dataframe())

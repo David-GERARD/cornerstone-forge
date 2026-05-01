@@ -66,6 +66,8 @@ _ports["dc"] = pf.PortSpec(
     current_path=[],
 )
 
+# TODO: fiber ports
+
 if __name__ == "__main__":
     tech = pf.basic_technology()
     tech.ports = _ports

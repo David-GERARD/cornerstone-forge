@@ -4,6 +4,7 @@ import photonforge as pf
 import tidy3d as td
 from _extrusions import _masks
 from _layers import _layer_specs, _media, _thicknesses
+from _ports import _ports
 
 
 @pf.parametric_technology
@@ -249,7 +250,7 @@ def csforge_si_220nm_pdk(
         version="0.1.0",
         layers=layers,
         extrusion_specs=extrusion_specs,
-        ports={},
+        ports=_ports,
         background_medium=media["air"],
         connections={},
     )
@@ -259,8 +260,10 @@ def csforge_si_220nm_pdk(
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
+    tech = csforge_si_220nm_pdk(include_substrate=True)
+    pf.config.default_technology = tech
     # viewer = LiveViewer()
-    c = pf.Component("test_component", technology=csforge_si_220nm_pdk(include_substrate=True))
+    c = pf.Component("test_component", technology=tech)
 
     # # Hole in waveguide test
     # c.add(
@@ -335,3 +338,14 @@ if __name__ == "__main__":
     ax1 = pf.tidy3d_plot(c, y=0)
 
     plt.show()
+    print(tech.ports)
+    pf.config.default_mesh_refinement = 30
+
+    freqs = [pf.C_0 / 1.55]
+
+    mode_solver = pf.port_modes("rib_1550nm_TE", freqs)
+    mode_solver.plot_field("E", mode_index=0, f=freqs[0], robust=False)
+
+    plt.show()
+
+    print(mode_solver.data.to_dataframe())

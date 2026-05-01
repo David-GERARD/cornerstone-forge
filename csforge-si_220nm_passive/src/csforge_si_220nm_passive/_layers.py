@@ -15,6 +15,9 @@ import photonforge as pf
 import tidy3d as td
 from data.materials import _load_material_data
 
+###############
+# LAYER SPECS
+###############
 _layer_specs = {
     "grating_ebl": pf.LayerSpec(
         layer=(60, 0),
@@ -90,7 +93,9 @@ _layer_specs = {
     ),
 }
 
+###############
 # MEDIA
+###############
 
 # Waveguide and substrate media
 medium_si, medium_sio2 = _load_material_data()
@@ -124,7 +129,9 @@ _media["tin"] = td.MultiPhysicsMedium(
 # Contact pads media (Aluminum as in cspdk https://github.com/gdsfactory/cspdk/blob/main/cspdk/si220/cband/tech.py)
 _media["al"] = td.material_library["Al"]["Rakic1995"]
 
-# THICKNESSES
+###############
+# LAYER THICKNESSES
+###############
 _thicknesses = {
     "box": 3.0,
     "waveguide": 0.22,

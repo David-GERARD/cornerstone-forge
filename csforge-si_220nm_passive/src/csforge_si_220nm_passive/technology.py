@@ -260,44 +260,77 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     # viewer = LiveViewer()
-    c = pf.Component("test_component", technology=csforge_si_220nm_pdk(include_substrate=False))
+    c = pf.Component("test_component", technology=csforge_si_220nm_pdk(include_substrate=True))
 
-    # Hole in waveguide test
+    # # Hole in waveguide test
+    # c.add(
+    #     "wg_lf",
+    #     pf.Rectangle((-2.5, -2), (-1.5, 2)),
+    #     "wg_df",
+    #     pf.Rectangle((-2.25, -2), (-1.75, 2)),
+    # )
+
+    # # Rib waveduide test
+    # c.add(
+    #     "wg_lf",
+    #     pf.Rectangle((-0.25, -2), (0.25, 2)),
+    #     "rib_slab",
+    #     pf.Rectangle((-0.5, -2), (0.5, 2)),
+    # )
+
+    # # Gratings test
+    # c.add(
+    #     "wg_lf",
+    #     pf.Rectangle((1.5, -2), (2.5, 2)),
+    #     "rib_slab",
+    #     pf.Rectangle((1, -2), (3, 2)),
+    #     "grating_ebl",
+    #     pf.Rectangle((1.25, -2), (1.75, 2)),
+    #     "grating_duv",
+    #     pf.Rectangle((2.25, -2), (2.75, 2)),
+    # )
+
+    # # Heater and contact pad test
+    # c.add(
+    #     "heater_fil",
+    #     pf.Rectangle((-2.5, -2), (0, 2)),
+    #     pf.Rectangle((2, -2), (3, 2)),
+    #     "contact_pad",
+    #     pf.Rectangle((-2.5, -2), (3, 2)),
+    # )
+
     c.add(
         "wg_lf",
-        pf.Rectangle((-2.5, -2), (-1.5, 2)),
-        "wg_df",
-        pf.Rectangle((-2.25, -2), (-1.75, 2)),
-    )
-
-    # Rib waveduide test
-    c.add(
-        "wg_lf",
-        pf.Rectangle((-0.25, -2), (0.25, 2)),
-        "rib_slab",
-        pf.Rectangle((-0.5, -2), (0.5, 2)),
-    )
-
-    # Gratings test
-    c.add(
-        "wg_lf",
-        pf.Rectangle((1.5, -2), (2.5, 2)),
-        "rib_slab",
-        pf.Rectangle((1, -2), (3, 2)),
+        pf.Rectangle((0.0, -2.0), (3.0, 2.0)),
         "grating_ebl",
-        pf.Rectangle((1.25, -2), (1.75, 2)),
+        pf.Rectangle((0.2, -2.0), (0.4, 2.0)),
+        pf.Rectangle((0.6, -2.0), (0.8, 2.0)),
         "grating_duv",
-        pf.Rectangle((2.25, -2), (2.75, 2)),
+        pf.Rectangle((1.2, -2.0), (1.4, 2.0)),
+        pf.Rectangle((1.6, -2.0), (1.8, 2.0)),
     )
 
-    # Heater and contact pad test
     c.add(
+        "wg_lf",
+        pf.Rectangle((3.0, -2.0), (5.2, 2.0)),
+        "wg_df",
+        pf.Rectangle((3.2, -2.0), (4, 2.0)),
+        pf.Rectangle((4.2, -2.0), (5.0, 2.0)),
         "heater_fil",
-        pf.Rectangle((-2.5, -2), (0, 2)),
-        pf.Rectangle((2, -2), (3, 2)),
+        pf.Rectangle((3.6, -2.0), (4.6, 2.0)),
         "contact_pad",
-        pf.Rectangle((-2.5, -2), (3, 2)),
+        pf.Rectangle((3.0, -2.0), (4.0, 2.0)),
+        pf.Rectangle((4.2, -2.0), (5.2, 2.0)),
     )
+
+    c.add(
+        "rib_slab",
+        pf.Rectangle((5.0, -2.0), (7.0, 2.0)),
+        "wg_lf",
+        pf.Rectangle((5.4, -2.0), (6.0, 2.0)),
+        pf.Rectangle((6.4, -2.0), (7.0, 2.0)),
+    )
+
     # viewer(c)
     ax1 = pf.tidy3d_plot(c, y=0)
 

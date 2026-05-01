@@ -1,42 +1,5 @@
 import photonforge as pf
-import tidy3d as td
 from _layers import _layer_specs
-from data.materials import _load_material_data
-
-# DEFAULT MEDIA
-
-# Waveguide and substrate media
-medium_si, medium_sio2 = _load_material_data()
-_media = {
-    "sio2": {
-        "optical": medium_sio2,
-        "electrical": td.Medium(permittivity=4.2, name="sio2"),
-    },
-    "si": {"optical": medium_si, "electrical": td.Medium(permittivity=12.3, name="si")},
-    "air": td.Medium(permittivity=1),
-}
-
-# Heaters media
-# Taken from https://www.flexcompute.com/tidy3d/examples/notebooks/ThermallyTunedRingResonator/
-TiN_k = 28e-6  # TiN thermal conductivity W/(um*K)
-TiN_s = 598  # TiN specific heat capacity, J / (Kg * K)
-TiN_sigma = 2.3  # Electric conductivity of TiN, S/um
-
-# Taken from https://refractiveindex.info/?shelf=main&book=TiN&page=Shkondin
-TiN_n_1550nm = 3.2303
-
-_media["tin"] = td.MultiPhysicsMedium(
-    optical=td.Medium(permittivity=TiN_n_1550nm**2, name="tin"),
-    heat=td.SolidMedium(
-        conductivity=TiN_k,
-        capacity=TiN_s,
-        name="tin",
-    ),
-)
-
-# Contact pads media (Aluminum as in cspdk https://github.com/gdsfactory/cspdk/blob/main/cspdk/si220/cband/tech.py)
-_media["al"] = td.material_library["Al"]["Rakic1995"]
-
 
 # MASKS FOR EXTRUSIONS
 _masks_layers = {
@@ -50,18 +13,7 @@ _masks_layers = {
     "Label_Etch_DF": pf.MaskSpec(_layer_specs["Label_Etch_DF"].layer),
 }
 
-# _tolerances = {
-#     "box": 0.0,
-#     "waveguide": 0.02,
-#     "rib_slab": 0.02,
-#     "ebeam_gratings": 0.01,
-#     "duv_gratings": 0.01,
-#     "tox": 0.2,
-#     "heater_fil": 0.01,
-#     "contact_pad": 0.01,
-# }
-
-
+# Passive layers
 _masks = {
     "substrate": -pf.MaskSpec((0, 0)),
     "waveguide": (_masks_layers["wg_lf"] - _masks_layers["wg_df"])
@@ -101,7 +53,6 @@ _masks["contact_pad_duv_gratings"] = (
 _masks["contact_pad_box"] = (
     _masks_layers["contact_pad"] * _masks["box"] * (-_masks_layers["heater_fil"])
 )
-
 mask_contact_pads_no_heaters = (
     _masks["contact_pad_waveguide"]
     + _masks["contact_pad_rib_slab"]
@@ -138,31 +89,3 @@ _masks["contact_pad_heater_fil_duv_gratings"] = (
 _masks["contact_pad_heater_fil_box"] = (
     _masks_layers["contact_pad"] * _masks["box"] * -mask_contact_pads_no_heaters
 )
-
-_thicknesses = {
-    "box": 3.0,
-    "waveguide": 0.22,
-    "rib_slab": 0.1,
-    "ebeam_gratings": 0.125,
-    "duv_gratings": 0.15,
-    "tox": 2.0,
-    "heater_fil": 0.15,
-    "contact_pad": 0.22,
-}
-
-
-if __name__ == "__main__":
-    TiN_k = 28e-6  # TiN thermal conductivity W/(um*K)
-    TiN_s = 598  # TiN specific heat capacity, J / (Kg * K)
-    TiN_sigma = 2.3  # Electric conductivity of TiN, S/um
-    tin = {
-        "optical": td.material_library,
-        "electrical": td.MultiPhysicsMedium(
-            heat_spec=td.SolidSpec(
-                conductivity=TiN_k,
-                capacity=TiN_s,
-            ),
-            name="TiN",
-        ),
-    }
-    print(type(tin["electrical"]))

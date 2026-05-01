@@ -12,6 +12,8 @@ Layers colors:
 """
 
 import photonforge as pf
+import tidy3d as td
+from data.materials import _load_material_data
 
 _layer_specs = {
     "grating_ebl": pf.LayerSpec(
@@ -88,5 +90,59 @@ _layer_specs = {
     ),
 }
 
-if __name__ == "__main__":
-    print(pf.LayerTable(_layer_specs))
+# MEDIA
+
+# Waveguide and substrate media
+medium_si, medium_sio2 = _load_material_data()
+_media = {
+    "sio2": {
+        "optical": medium_sio2,
+        "electrical": td.Medium(permittivity=4.2, name="sio2"),
+    },
+    "si": {"optical": medium_si, "electrical": td.Medium(permittivity=12.3, name="si")},
+    "air": td.Medium(permittivity=1),
+}
+
+# Heaters media
+# Taken from https://www.flexcompute.com/tidy3d/examples/notebooks/ThermallyTunedRingResonator/
+TiN_k = 28e-6  # TiN thermal conductivity W/(um*K)
+TiN_s = 598  # TiN specific heat capacity, J / (Kg * K)
+TiN_sigma = 2.3  # Electric conductivity of TiN, S/um
+
+# Taken from https://refractiveindex.info/?shelf=main&book=TiN&page=Shkondin
+TiN_n_1550nm = 3.2303
+
+_media["tin"] = td.MultiPhysicsMedium(
+    optical=td.Medium(permittivity=TiN_n_1550nm**2, name="tin"),
+    heat=td.SolidMedium(
+        conductivity=TiN_k,
+        capacity=TiN_s,
+        name="tin",
+    ),
+)
+
+# Contact pads media (Aluminum as in cspdk https://github.com/gdsfactory/cspdk/blob/main/cspdk/si220/cband/tech.py)
+_media["al"] = td.material_library["Al"]["Rakic1995"]
+
+# THICKNESSES
+_thicknesses = {
+    "box": 3.0,
+    "waveguide": 0.22,
+    "rib_slab": 0.1,
+    "ebeam_gratings": 0.125,
+    "duv_gratings": 0.15,
+    "tox": 2.0,
+    "heater_fil": 0.15,
+    "contact_pad": 0.22,
+}
+
+# _tolerances = {
+#     "box": 0.0,
+#     "waveguide": 0.02,
+#     "rib_slab": 0.02,
+#     "ebeam_gratings": 0.01,
+#     "duv_gratings": 0.01,
+#     "tox": 0.2,
+#     "heater_fil": 0.01,
+#     "contact_pad": 0.01,
+# }

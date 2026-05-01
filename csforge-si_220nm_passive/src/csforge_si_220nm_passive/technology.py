@@ -2,8 +2,8 @@
 
 import photonforge as pf
 import tidy3d as td
-from _extrusions import _masks, _media, _thicknesses
-from _layers import _layer_specs
+from _extrusions import _masks
+from _layers import _layer_specs, _media, _thicknesses
 
 
 @pf.parametric_technology

@@ -1,4 +1,62 @@
-site_name: Cornerstone Forge Documentation
+site_name: Cornerstone Forge
+site_description: PhotonForge implementation of Cornerstone's silicon photonics PDKs
+site_author: David Gerard
+copyright: "2026, David GERARD"
+docs_dir: docs
+site_dir: build
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: black
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      base_path: ['.', 'docs']
+  - tables
+  - attr_list
+  - md_in_html
 
 nav:
-  - index.md
+  - Home:
+    - index.md
+  - Contributors:
+    - Tools: developers/tools.md
+    - Installation: developers/installation.md
+    - Build & Workflow: developers/build.md
+  - Users:
+    - Installation: users/installation.md
+    - Usage: users/usage.md
+  - PDKs:
+    - SI 220nm Passive: pdks/csforge-si_220nm_passive.md

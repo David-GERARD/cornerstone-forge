@@ -2,47 +2,97 @@
 
 Exposes ``csforge_si_220nm_pdk``, a ``@pf.parametric_technology`` factory that assembles
 layers, extrusion specs (waveguide, rib slab, EBL/DUV gratings, heater filaments, and
-contact pads), port specs, and background medium into a ``pf.Technology`` object.  The
-``include_substrate`` flag adds a silicon substrate extrusion below the BOX layer.
+contact pads), port specs, and background medium into a ``pf.Technology`` object.
+
+Every layer thickness, the silicon sidewall angle (default 5°), and each optical or
+electrical medium can be overridden individually via keyword arguments.  Setting
+``include_substrate=True`` appends a semi-infinite silicon substrate extrusion that
+extends from ``-pf.Z_INF`` to the bottom of the BOX layer.
 """
 
+from typing import Literal
+
 import photonforge as pf
-import tidy3d as td
+import photonforge.typing as pft
 
 from ._extrusions import _masks
 from ._layers import _connections, _layer_specs, _thicknesses
 from ._media import _media
 from ._ports import _ports
 
+_MediumType = pft.Medium | dict[Literal["optical", "electrical"], pft.Medium]
+
 
 @pf.parametric_technology
 def csforge_si_220nm_pdk(
-    masks: dict[str, pf.MaskSpec] = _masks,
-    media: dict[str, dict[str, td.Tidy3dBaseModel]] = _media,
-    thicknesses: dict[str, float] = _thicknesses,
+    box_thickness: pft.PositiveDimension = _thicknesses["box"],
+    waveguide_thickness: pft.PositiveDimension = _thicknesses["strip"],
+    rib_slab_thickness: pft.PositiveDimension = _thicknesses["rib_slab"],
+    ebeam_gratings_thickness: pft.PositiveDimension = _thicknesses["ebeam_gratings"],
+    duv_gratings_thickness: pft.PositiveDimension = _thicknesses["duv_gratings"],
+    tox_thickness: pft.PositiveDimension = _thicknesses["tox"],
+    heater_fil_thickness: pft.PositiveDimension = _thicknesses["heater_fil"],
+    contact_pad_thickness: pft.PositiveDimension = _thicknesses["contact_pad"],
+    sidewall_angle_si: pft.Angle = 5.0,
+    sio2: _MediumType = _media["sio2"],
+    si: _MediumType = _media["si"],
+    tin: _MediumType = _media["tin"],
+    al: _MediumType = _media["al"],
+    air: _MediumType = _media["air"],
     include_substrate: bool = False,
 ) -> pf.Technology:
-    """Defines the parametric technology for Cornerstone's Si 220nm passive PDK."""
+    """Defines the parametric technology for Cornerstone's Si 220nm passive PDK.
+
+    Args:
+        box_thickness: Thickness of the BOX layer in um.
+        waveguide_thickness: Thickness of the strip waveguide layer in um.
+        rib_slab_thickness: Thickness of the rib slab layer in um.
+        ebeam_gratings_thickness: Thickness of the e-beam gratings layer in um.
+        duv_gratings_thickness: Thickness of the DUV gratings layer in um.
+        tox_thickness: Thickness of the top oxide SiO2 layer in um.
+        heater_fil_thickness: Thickness of the heater filament layer in um.
+        contact_pad_thickness: Thickness of the contact pad layer in um.
+        sidewall_angle_si: Sidewall angle for silicon layers in degrees.
+        sio2: Medium for SiO2.
+        si: Medium for silicon.
+        tin: Medium for tin.
+        al: Medium for aluminum.
+        air: Medium for air.
+        include_substrate: Whether to include the silicon substrate below the BOX layer.
+
+    Returns:
+        A parametric technology object.
+
+    """
+    masks = _masks
+
     layers = {k: v.copy() for k, v in _layer_specs.items()}
+
+    media = {
+        "sio2": sio2,
+        "si": si,
+        "tin": tin,
+        "al": al,
+        "air": air,
+    }
+
+    thicknesses = {
+        "box": box_thickness,
+        "strip": waveguide_thickness,
+        "rib_slab": rib_slab_thickness,
+        "ebeam_gratings": ebeam_gratings_thickness,
+        "duv_gratings": duv_gratings_thickness,
+        "tox": tox_thickness,
+        "heater_fil": heater_fil_thickness,
+        "contact_pad": contact_pad_thickness,
+    }
 
     # Passive layers extrusions
     extrusion_specs = [
         pf.ExtrusionSpec(
-            mask_spec=masks["waveguide"],
-            medium=media["si"],
-            limits=(0, thicknesses["waveguide"]),
-            sidewall_angle=0.0,
-        ),
-        pf.ExtrusionSpec(
-            mask_spec=masks["waveguide"],
+            mask_spec=masks["strip"],
             medium=media["sio2"],
-            limits=(thicknesses["waveguide"], thicknesses["waveguide"] + thicknesses["tox"]),
-            sidewall_angle=0.0,
-        ),
-        pf.ExtrusionSpec(
-            mask_spec=masks["rib_slab"],
-            medium=media["si"],
-            limits=(0, thicknesses["rib_slab"]),
+            limits=(thicknesses["strip"], thicknesses["strip"] + thicknesses["tox"]),
             sidewall_angle=0.0,
         ),
         pf.ExtrusionSpec(
@@ -53,23 +103,11 @@ def csforge_si_220nm_pdk(
         ),
         pf.ExtrusionSpec(
             mask_spec=masks["ebeam_gratings"],
-            medium=media["si"],
-            limits=(0, thicknesses["ebeam_gratings"]),
-            sidewall_angle=0.0,
-        ),
-        pf.ExtrusionSpec(
-            mask_spec=masks["ebeam_gratings"],
             medium=media["sio2"],
             limits=(
                 thicknesses["ebeam_gratings"],
                 thicknesses["ebeam_gratings"] + thicknesses["tox"],
             ),
-            sidewall_angle=0.0,
-        ),
-        pf.ExtrusionSpec(
-            mask_spec=masks["duv_gratings"],
-            medium=media["si"],
-            limits=(0, thicknesses["duv_gratings"]),
             sidewall_angle=0.0,
         ),
         pf.ExtrusionSpec(
@@ -89,6 +127,30 @@ def csforge_si_220nm_pdk(
             limits=(-thicknesses["box"], 0),
             sidewall_angle=0.0,
         ),
+        pf.ExtrusionSpec(
+            mask_spec=masks["strip"],
+            medium=media["si"],
+            limits=(0, thicknesses["strip"]),
+            sidewall_angle=sidewall_angle_si,
+        ),
+        pf.ExtrusionSpec(
+            mask_spec=masks["rib_slab"],
+            medium=media["si"],
+            limits=(0, thicknesses["rib_slab"]),
+            sidewall_angle=sidewall_angle_si,
+        ),
+        pf.ExtrusionSpec(
+            mask_spec=masks["duv_gratings"],
+            medium=media["si"],
+            limits=(0, thicknesses["duv_gratings"]),
+            sidewall_angle=sidewall_angle_si,
+        ),
+        pf.ExtrusionSpec(
+            mask_spec=masks["ebeam_gratings"],
+            medium=media["si"],
+            limits=(0, thicknesses["ebeam_gratings"]),
+            sidewall_angle=sidewall_angle_si,
+        ),
     ]
 
     # Heater layer extrusions
@@ -97,8 +159,8 @@ def csforge_si_220nm_pdk(
             mask_spec=masks["heater_fil_waveguide"],
             medium=media["tin"],
             limits=(
-                thicknesses["waveguide"] + thicknesses["tox"],
-                thicknesses["waveguide"] + thicknesses["tox"] + thicknesses["heater_fil"],
+                thicknesses["strip"] + thicknesses["tox"],
+                thicknesses["strip"] + thicknesses["tox"] + thicknesses["heater_fil"],
             ),
             sidewall_angle=0.0,
         ),
@@ -143,8 +205,8 @@ def csforge_si_220nm_pdk(
             mask_spec=masks["contact_pad_waveguide"],
             medium=media["al"],
             limits=(
-                thicknesses["waveguide"] + thicknesses["tox"],
-                thicknesses["waveguide"] + thicknesses["tox"] + thicknesses["contact_pad"],
+                thicknesses["strip"] + thicknesses["tox"],
+                thicknesses["strip"] + thicknesses["tox"] + thicknesses["contact_pad"],
             ),
             sidewall_angle=0.0,
         ),
@@ -188,8 +250,8 @@ def csforge_si_220nm_pdk(
             mask_spec=masks["contact_pad_heater_fil_waveguide"],
             medium=media["al"],
             limits=(
-                thicknesses["waveguide"] + thicknesses["tox"] + thicknesses["heater_fil"],
-                thicknesses["waveguide"]
+                thicknesses["strip"] + thicknesses["tox"] + thicknesses["heater_fil"],
+                thicknesses["strip"]
                 + thicknesses["tox"]
                 + thicknesses["heater_fil"]
                 + thicknesses["contact_pad"],
@@ -248,7 +310,7 @@ def csforge_si_220nm_pdk(
             pf.ExtrusionSpec(
                 mask_spec=masks["substrate"],
                 medium=media["si"],
-                limits=(-thicknesses["box"] * 2, -thicknesses["box"]),
+                limits=(-pf.Z_INF, -thicknesses["box"]),
                 sidewall_angle=0.0,
             ),
         ]
@@ -258,7 +320,7 @@ def csforge_si_220nm_pdk(
         version="0.1.0",
         layers=layers,
         extrusion_specs=extrusion_specs,
-        ports=_ports,
+        ports=_ports(thicknesses),
         background_medium=media["air"],
         connections=_connections,
     )
@@ -270,9 +332,11 @@ if __name__ == "__main__":
 
     tech = csforge_si_220nm_pdk(include_substrate=True)
     pf.config.default_technology = tech
-    from photonforge.live_viewer import LiveViewer
+    # from photonforge.live_viewer import LiveViewer
 
-    viewer = LiveViewer()
+    print(tech.ports)
+
+    # viewer = LiveViewer()
     c = pf.Component("test_component", technology=tech)
 
     c.add(
@@ -307,18 +371,18 @@ if __name__ == "__main__":
         pf.Rectangle((6.4, -2.0), (7.0, 2.0)),
     )
 
-    viewer(c)
+    # viewer(c)
     ax1 = pf.tidy3d_plot(c, y=0)
 
     plt.show()
-    print(tech.ports)
-    pf.config.default_mesh_refinement = 30
+    # print(tech.ports)
+    # pf.config.default_mesh_refinement = 30
 
-    freqs = [pf.C_0 / 1.55]
+    # freqs = [pf.C_0 / 1.55]
 
-    mode_solver = pf.port_modes("rib_1550nm_TE", freqs)
-    mode_solver.plot_field("E", mode_index=0, f=freqs[0], robust=False)
+    # mode_solver = pf.port_modes("rib_1550nm_TE", freqs)
+    # mode_solver.plot_field("E", mode_index=0, f=freqs[0], robust=False)
 
-    plt.show()
+    # plt.show()
 
-    print(mode_solver.data.to_dataframe())
+    # print(mode_solver.data.to_dataframe())

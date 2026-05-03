@@ -165,7 +165,7 @@ _connections = [(_layer_specs["heater_fil"].layer, _layer_specs["contact_pad"].l
 ###############
 _thicknesses = {
     "box": 3.0,
-    "waveguide": 0.22,
+    "strip": 0.22,
     "rib_slab": 0.1,
     "ebeam_gratings": 0.125,
     "duv_gratings": 0.15,
@@ -176,7 +176,7 @@ _thicknesses = {
 
 # _tolerances = {
 #     "box": 0.0,
-#     "waveguide": 0.02,
+#     "strip": 0.02,
 #     "rib_slab": 0.02,
 #     "ebeam_gratings": 0.01,
 #     "duv_gratings": 0.01,

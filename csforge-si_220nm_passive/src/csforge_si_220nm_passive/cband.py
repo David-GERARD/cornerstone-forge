@@ -157,7 +157,7 @@ components["SOI220nm_1550nm_TE_STRIP_Waveguide_Crossing"] = (
 component_names = list(components.keys())
 
 if __name__ == "__main__":
-    from technology import csforge_si_220nm_pdk
+    from .technology import csforge_si_220nm_pdk
 
     tech = csforge_si_220nm_pdk()
     pf.config.default_technology = tech
@@ -167,11 +167,15 @@ if __name__ == "__main__":
         c = components[name]
         print(f"  Ports: {list(c.ports.keys())}")
 
-    import matplotlib.pyplot as plt
-    import numpy as np
+    # import matplotlib.pyplot as plt
+    # import numpy as np
 
-    crossing = SOI220nm_1550nm_TE_STRIP_Waveguide_Crossing()
-    s_matrix = crossing.s_matrix(pf.C_0 / np.linspace(1.4, 1.6, 21))
-    _ = pf.plot_s_matrix(s_matrix)
+    # crossing = SOI220nm_1550nm_TE_STRIP_Waveguide_Crossing()
+    # s_matrix = crossing.s_matrix(pf.C_0 / np.linspace(1.4, 1.6, 21))
+    # _ = pf.plot_s_matrix(s_matrix)
 
-    plt.show()
+    # plt.show()
+
+    components["SOI220nm_1550nm_TE_STRIP_Waveguide_Crossing"].write_gds(
+        "SOI220nm_1550nm_TE_STRIP_Waveguide_Crossing.gds"
+    )

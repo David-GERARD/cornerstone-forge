@@ -3,7 +3,8 @@
 import photonforge as pf
 import tidy3d as td
 from _extrusions import _masks
-from _layers import _connections, _layer_specs, _media, _thicknesses
+from _layers import _connections, _layer_specs, _thicknesses
+from _media import _media
 from _ports import _ports
 
 
@@ -262,45 +263,10 @@ if __name__ == "__main__":
 
     tech = csforge_si_220nm_pdk(include_substrate=True)
     pf.config.default_technology = tech
-    # viewer = LiveViewer()
+    from photonforge.live_viewer import LiveViewer
+
+    viewer = LiveViewer()
     c = pf.Component("test_component", technology=tech)
-
-    # # Hole in waveguide test
-    # c.add(
-    #     "wg_lf",
-    #     pf.Rectangle((-2.5, -2), (-1.5, 2)),
-    #     "wg_df",
-    #     pf.Rectangle((-2.25, -2), (-1.75, 2)),
-    # )
-
-    # # Rib waveduide test
-    # c.add(
-    #     "wg_lf",
-    #     pf.Rectangle((-0.25, -2), (0.25, 2)),
-    #     "rib_slab",
-    #     pf.Rectangle((-0.5, -2), (0.5, 2)),
-    # )
-
-    # # Gratings test
-    # c.add(
-    #     "wg_lf",
-    #     pf.Rectangle((1.5, -2), (2.5, 2)),
-    #     "rib_slab",
-    #     pf.Rectangle((1, -2), (3, 2)),
-    #     "grating_ebl",
-    #     pf.Rectangle((1.25, -2), (1.75, 2)),
-    #     "grating_duv",
-    #     pf.Rectangle((2.25, -2), (2.75, 2)),
-    # )
-
-    # # Heater and contact pad test
-    # c.add(
-    #     "heater_fil",
-    #     pf.Rectangle((-2.5, -2), (0, 2)),
-    #     pf.Rectangle((2, -2), (3, 2)),
-    #     "contact_pad",
-    #     pf.Rectangle((-2.5, -2), (3, 2)),
-    # )
 
     c.add(
         "wg_lf",
@@ -334,18 +300,18 @@ if __name__ == "__main__":
         pf.Rectangle((6.4, -2.0), (7.0, 2.0)),
     )
 
-    # viewer(c)
+    viewer(c)
     ax1 = pf.tidy3d_plot(c, y=0)
 
     plt.show()
     print(tech.ports)
-    # pf.config.default_mesh_refinement = 30
+    pf.config.default_mesh_refinement = 30
 
-    # freqs = [pf.C_0 / 1.55]
+    freqs = [pf.C_0 / 1.55]
 
-    # mode_solver = pf.port_modes("rib_1550nm_TE", freqs)
-    # mode_solver.plot_field("E", mode_index=0, f=freqs[0], robust=False)
+    mode_solver = pf.port_modes("rib_1550nm_TE", freqs)
+    mode_solver.plot_field("E", mode_index=0, f=freqs[0], robust=False)
 
-    # plt.show()
+    plt.show()
 
-    # print(mode_solver.data.to_dataframe())
+    print(mode_solver.data.to_dataframe())

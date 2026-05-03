@@ -13,7 +13,7 @@ pf.config.default_technology = tech
 _GDS_DIR = pathlib.Path(__file__).parent / "gds"
 
 
-def _import_component_with_ports(component_name) -> pf.Component:
+def _import_component_with_ports(component_name: str) -> pf.Component:
     """Import a PDK component from its GDS file and attach its ports from the YAML spec.
 
     Looks for ``<component_name>.gds`` and ``<component_name>.yaml`` in the
@@ -68,6 +68,6 @@ def _import_component_with_ports(component_name) -> pf.Component:
             input_direction=input_direction,
             spec=port_def["cross_section"],
         )
-        component.add_port(port, "P" + port_def["name"][-1])
+        component.add_port(port, port_def["name"])
 
     return component

@@ -1,5 +1,14 @@
+"""Mask specs used to construct the layer extrusions in the SI 220nm passive PDK.
+
+Each ``_masks`` entry combines one or more raw layer masks with boolean operations to
+produce the Boolean region that a given material occupies in 3-D (e.g. the waveguide
+silicon, the rib slab, gratings, heater filaments, and contact pads at their respective
+levels above or below the waveguide).
+"""
+
 import photonforge as pf
-from _layers import _layer_specs
+
+from ._layers import _layer_specs
 
 # MASKS FOR EXTRUSIONS
 _masks_layers = {

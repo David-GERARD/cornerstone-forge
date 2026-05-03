@@ -1,10 +1,10 @@
 """This module contains the implementation of Cornerstone's SI 220nm passive PDK."""
 
-from cband import component_names as cband_component_names
-from cband import components as cband_components
-from oband import component_names as oband_component_names
-from oband import components as oband_components
-from technology import csforge_si_220nm_pdk
+from .cband import component_names as cband_component_names
+from .cband import components as cband_components
+from .oband import component_names as oband_component_names
+from .oband import components as oband_components
+from .technology import csforge_si_220nm_pdk
 
 components = oband_components | cband_components
 component_names = oband_component_names + cband_component_names

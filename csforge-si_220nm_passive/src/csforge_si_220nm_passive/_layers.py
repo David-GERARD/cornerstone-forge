@@ -1,18 +1,20 @@
-"""This module declares the layers, media, and thicknesses for the Si_220nm_passive PDK.
+"""Layer specs, electrical connections, and process thicknesses for the SI 220nm passive PDK.
 
-Layers scpecs:
-    - Source: https://github.com/cornerstone-uos/cornerstone-pdk/blob/main/Si_220nm_passive/process_overview.yaml
-    - Alias is used as a key for the layer. with the full name in the description for clarity.
-    - The layer number and datatype are defined in the layer tuple.
-    - The description provides the layer full name and its purpose.
-    - Colors from https://github.com/cornerstone-uos/cornerstone-pdk/blob/main/Si_220nm_passive/layers.lyp
+Layer specs (``_layer_specs``):
+    Each key is a short alias used throughout the package; the value is a
+    ``pf.LayerSpec`` carrying the GDS (layer, datatype) tuple, a human-readable
+    description, and a display colour.  Sourced from the Cornerstone PDK process
+    overview and layer file:
+    https://github.com/cornerstone-uos/cornerstone-pdk/blob/main/Si_220nm_passive/process_overview.yaml
+    https://github.com/cornerstone-uos/cornerstone-pdk/blob/main/Si_220nm_passive/layers.lyp
 
-Connections:
-    - Heater filaments and contact pads are connected.
+Connections (``_connections``):
+    List of (layer_a, layer_b) tuples that are electrically shorted.  Currently
+    heater filaments (``heater_fil``) and contact pads (``contact_pad``) are connected.
 
-Thicknesses:
-    - Source: https://github.com/cornerstone-uos/cornerstone-pdk/blob/main/Si_220nm_passive/process_overview.yaml
-
+Thicknesses (``_thicknesses``):
+    Physical layer thicknesses in microns.  Sourced from:
+    https://github.com/cornerstone-uos/cornerstone-pdk/blob/main/Si_220nm_passive/process_overview.yaml
 """
 
 import photonforge as pf

@@ -9,7 +9,8 @@ Media:
 """
 
 import tidy3d as td
-from data.materials import _load_material_data
+
+from .data.materials import _load_material_data
 
 ###############
 # MEDIA

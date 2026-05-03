@@ -1,7 +1,8 @@
 """O-band (1310 nm) component wrappers for the SI 220nm passive PDK."""
 
 import photonforge as pf
-from _utils import _import_component_with_ports
+
+from ._utils import _import_component_with_ports
 
 components = {}
 

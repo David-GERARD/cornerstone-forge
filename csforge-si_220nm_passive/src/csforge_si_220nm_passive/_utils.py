@@ -5,7 +5,8 @@ import warnings
 
 import photonforge as pf
 import yaml
-from technology import csforge_si_220nm_pdk
+
+from .technology import csforge_si_220nm_pdk
 
 tech = csforge_si_220nm_pdk()
 pf.config.default_technology = tech

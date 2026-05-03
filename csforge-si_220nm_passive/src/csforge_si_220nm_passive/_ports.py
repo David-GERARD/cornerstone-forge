@@ -1,10 +1,13 @@
-"""Ports for csforge_si_220nm_passive technology.
+"""Port specs for the SI 220nm passive PDK technology.
 
-Targets neff values were taken from cspdk.
+Defines optical port specs for strip and rib waveguides at 1310 nm and 1550 nm, plus
+an electrical DC port spec for heater pads.  Target effective-index (neff) values are
+taken from cspdk (https://github.com/gdsfactory/cspdk).
 """
 
 import photonforge as pf
-from _layers import _layer_specs
+
+from ._layers import _layer_specs
 
 _ports = {}
 

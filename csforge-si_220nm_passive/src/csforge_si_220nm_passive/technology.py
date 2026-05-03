@@ -1,11 +1,18 @@
-"""This file contains the parametric technology definition for the SI 220nm passive PDK."""
+"""Parametric technology definition for Cornerstone's SI 220nm passive PDK.
+
+Exposes ``csforge_si_220nm_pdk``, a ``@pf.parametric_technology`` factory that assembles
+layers, extrusion specs (waveguide, rib slab, EBL/DUV gratings, heater filaments, and
+contact pads), port specs, and background medium into a ``pf.Technology`` object.  The
+``include_substrate`` flag adds a silicon substrate extrusion below the BOX layer.
+"""
 
 import photonforge as pf
 import tidy3d as td
-from _extrusions import _masks
-from _layers import _connections, _layer_specs, _thicknesses
-from _media import _media
-from _ports import _ports
+
+from ._extrusions import _masks
+from ._layers import _connections, _layer_specs, _thicknesses
+from ._media import _media
+from ._ports import _ports
 
 
 @pf.parametric_technology

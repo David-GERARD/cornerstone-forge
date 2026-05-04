@@ -189,11 +189,11 @@ def test_technology_has_ports():
         assert port_name in tech.ports, f"Port spec '{port_name}' missing from technology"
 
 
-def test_technology_substrate_adds_one_extrusion():
-    """Test that include_substrate=True adds exactly one extrusion to the stack."""
+def test_technology_substrate_adds_two_extrusion():
+    """Test that include_substrate=True adds exactly two extrusions to the stack."""
     tech_no_sub = csforge_si_220nm_pdk(include_substrate=False)
     tech_with_sub = csforge_si_220nm_pdk(include_substrate=True)
-    assert len(tech_with_sub.extrusion_specs) == len(tech_no_sub.extrusion_specs) + 1
+    assert len(tech_with_sub.extrusion_specs) == len(tech_no_sub.extrusion_specs) + 2
 
 
 def test_technology_export_roundtrip(tmp_path):
@@ -203,3 +203,51 @@ def test_technology_export_roundtrip(tmp_path):
     pf.write_phf(tech_file, tech)
     tech_loaded = pf.load_phf(tech_file)["technologies"][0]
     assert tech_loaded == tech
+
+
+def test_area_outside_of_layout_is_air():
+    """Test that the area outside of the layout is assigned the background medium."""
+    # Test that the background is air
+    tech = csforge_si_220nm_pdk()
+    assert tech.background_medium.permittivity == 1.0
+
+    # Test that a point far outside the layout is assigned the background medium
+    # Gaussian port will return an error if it intersects multiple media,
+    # so we place it far from the layout to ensure it only intersects the background medium
+    c2 = pf.Component("test_component_2", technology=tech)
+    c2.add_reference(
+        pf.parametric.straight(technology=tech, port_spec=tech.ports["rib_1550nm_TE"], length=5.0)
+    )
+    gaussian_port_x = pf.GaussianPort(
+        center=(
+            -5.0,
+            0.0,
+            0.0,
+        ),
+        input_vector=(1, 0, 0),
+        waist_radius=2.0,
+        polarization_angle=0,  # for TE mode, in this case
+    )
+    gaussian_port_y = pf.GaussianPort(
+        center=(
+            0.0,
+            -10.0,
+            0.0,
+        ),
+        input_vector=(0, 1, 0),
+        waist_radius=2.0,
+        polarization_angle=0,  # for TE mode, in this case
+    )
+    gaussian_port_z = pf.GaussianPort(
+        center=(
+            0.0,
+            0.0,
+            +5.0,
+        ),
+        input_vector=(0, 0, 1),
+        waist_radius=2.0,
+        polarization_angle=0,  # for TE mode, in this case
+    )
+
+    c2.add_port([gaussian_port_x, gaussian_port_y, gaussian_port_z])
+    pf.tidy3d_plot(c2, x=0.2)

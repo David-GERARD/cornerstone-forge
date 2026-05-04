@@ -20,12 +20,13 @@ _masks_layers = {
     "heater_fil": pf.MaskSpec(_layer_specs["heater_fil"].layer),
     "contact_pad": pf.MaskSpec(_layer_specs["contact_pad"].layer),
     "Label_Etch_DF": pf.MaskSpec(_layer_specs["Label_Etch_DF"].layer),
+    "FloorPlan": pf.MaskSpec(_layer_specs["FloorPlan"].layer),
 }
 
 _masks = {}
 
 # Passive layers
-_masks["substrate"] = -pf.MaskSpec((0, 0))
+_masks["substrate"] = _masks_layers["FloorPlan"]
 _masks["strip"] = (_masks_layers["wg_lf"] - _masks_layers["wg_df"]) * (
     -_masks_layers["grating_ebl"] - _masks_layers["grating_duv"]
 )
@@ -38,16 +39,26 @@ _masks["duv_gratings"] = (_masks_layers["wg_lf"] + -_masks_layers["wg_df"]) * _m
 _masks["rib_slab"] = _masks_layers["rib_slab"] * -(
     _masks["strip"] + _masks["ebeam_gratings"] + _masks["duv_gratings"]
 )
-_masks["box"] = -(
-    _masks["strip"] + _masks["rib_slab"] + _masks["ebeam_gratings"] + _masks["duv_gratings"]
-)
+_masks["box"] = (
+    _masks["strip"]
+    + _masks["rib_slab"]
+    + _masks["ebeam_gratings"]
+    + _masks["duv_gratings"]
+    + _masks_layers["FloorPlan"]
+) ** 1.0  # dilate the box mask by 1um to ensure it fully covers the area outside the waveguides,
+# gratings, and rib slab
 
 # Heaters
 _masks["heater_fil_waveguide"] = _masks_layers["heater_fil"] * _masks["strip"]
 _masks["heater_fil_ebeam_gratings"] = _masks_layers["heater_fil"] * _masks["ebeam_gratings"]
 _masks["heater_fil_duv_gratings"] = _masks_layers["heater_fil"] * _masks["duv_gratings"]
 _masks["heater_fil_rib_slab"] = _masks_layers["heater_fil"] * _masks["rib_slab"]
-_masks["heater_fil_box"] = _masks_layers["heater_fil"] * _masks["box"]
+_masks["heater_fil_box"] = _masks_layers["heater_fil"] * -(
+    _masks["heater_fil_waveguide"]
+    + _masks["heater_fil_ebeam_gratings"]
+    + _masks["heater_fil_duv_gratings"]
+    + _masks["heater_fil_rib_slab"]
+)
 
 # Contact pads, no heaters
 _masks["contact_pad_waveguide"] = (

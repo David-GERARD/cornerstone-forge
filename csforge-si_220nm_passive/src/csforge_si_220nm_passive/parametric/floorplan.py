@@ -5,9 +5,9 @@ import photonforge.typing as pft
 
 
 @pf.parametric_component
-def _SOI22nm_Floorplan(
-    x_width_mm: pft.PositiveFloat,
-    y_width_mm: pft.PositiveFloat,
+def SOI220nm_Floorplan(
+    x_width_mm: pft.PositiveFloat = 11.47,
+    y_width_mm: pft.PositiveFloat = 4.9,
     position: pft.Coordinate = (0.0, 0.0),
 ) -> pf.Component:
     """Floorplan component for the SI 220nm passive PDK.
@@ -46,7 +46,7 @@ def SOI220nm_Floorplan_11_47mm_x_4_9mm(
         A Component representing the floorplan.
 
     """
-    return _SOI22nm_Floorplan(11.47, 4.9, position)
+    return SOI220nm_Floorplan(x_width_mm=11.47, y_width_mm=4.9, position=position)
 
 
 def SOI220nm_Floorplan_5_5mm_x_4_9mm(
@@ -61,4 +61,4 @@ def SOI220nm_Floorplan_5_5mm_x_4_9mm(
         A Component representing the floorplan.
 
     """
-    return _SOI22nm_Floorplan(5.5, 4.9, position)
+    return SOI220nm_Floorplan(x_width_mm=5.5, y_width_mm=4.9, position=position)

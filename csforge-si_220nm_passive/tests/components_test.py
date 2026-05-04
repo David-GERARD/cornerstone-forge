@@ -40,20 +40,33 @@ def test_cband_components():
         assert isinstance(component, pf.Component), f"{name} did not return a Component"
 
 
+def test_allband_components():
+    """Test that all band-agnostic components can be instantiated without errors."""
+    for name in pdk.allband_component_names:
+        component = pdk.components[name]
+        assert isinstance(component, pf.Component), f"{name} did not return a Component"
+
+
 def test_component_names_non_empty():
     """Test that the component catalogue contains at least one entry."""
     assert len(pdk.component_names) > 0, "component_names must not be empty"
 
 
-def test_oband_and_cband_disjoint():
-    """Test that O-band and C-band catalogues share no component names."""
-    overlap = set(pdk.oband_component_names) & set(pdk.cband_component_names)
+def test_oband_and_cband_and_allband_disjoint():
+    """Test that O-band, C-band, and All-band catalogues share no component names."""
+    overlap = (
+        set(pdk.oband_component_names)
+        & set(pdk.cband_component_names)
+        & set(pdk.allband_component_names)
+    )
     assert overlap == set(), f"Bands share component names: {overlap}"
 
 
 def test_all_components_covered():
-    """Test that the combined catalogue equals oband + cband."""
-    combined = set(pdk.oband_component_names + pdk.cband_component_names)
+    """Test that the combined catalogue equals oband + cband + allband."""
+    combined = set(
+        pdk.oband_component_names + pdk.cband_component_names + pdk.allband_component_names
+    )
     assert combined == set(pdk.component_names)
 
 

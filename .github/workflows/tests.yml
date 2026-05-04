@@ -20,18 +20,8 @@ jobs:
         shell: bash
         run: |
           # Read workspace members from pyproject.toml (tomllib is stdlib since Python 3.11)
-          ALL=$(python3 -c "
-import tomllib, json
-with open('pyproject.toml', 'rb') as f:
-    members = tomllib.load(f)['tool']['uv']['workspace']['members']
-print(json.dumps(members))
-")
-          MEMBERS=$(python3 -c "
-import tomllib
-with open('pyproject.toml', 'rb') as f:
-    members = tomllib.load(f)['tool']['uv']['workspace']['members']
-print(' '.join(members))
-")
+          ALL=$(python3 -c 'import tomllib,json; m=tomllib.load(open("pyproject.toml","rb"))["tool"]["uv"]["workspace"]["members"]; print(json.dumps(m))')
+          MEMBERS=$(python3 -c 'import tomllib; m=tomllib.load(open("pyproject.toml","rb"))["tool"]["uv"]["workspace"]["members"]; print(" ".join(m))')
           # ERE pattern matching any package subdirectory, e.g. ^(pkg-a|pkg-b)/
           PKG_PATTERN="^($(echo "$MEMBERS" | tr ' ' '|'))/"
 

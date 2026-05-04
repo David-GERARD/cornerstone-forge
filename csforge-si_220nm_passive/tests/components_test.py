@@ -207,3 +207,27 @@ def test_mzi_has_two_electrical_ports(tech, name: str):
     c = pdk.component(name, technology=tech)
     assert len(c.ports) == 2, f"{name}: expected 2 ports, got {len(c.ports)}"
     assert _port_names(c) == ["e1", "e2"]
+
+
+# ---------------------------------------------------------------------------
+# Component models
+# ---------------------------------------------------------------------------
+
+
+def test_component_model_matches_optical_ports(tech):
+    """Test that every component model's port symmetries match the component's optical ports."""
+    for name in pdk.component_names:
+        c = pdk.component(name, technology=tech)
+        # Check if the component has a Tidy3D model
+        if "Tidy3D" in c.models:
+            model = c.models["Tidy3D"]
+            # port_symmetries contains (name, Port) tuples from .items() — extract names only
+            model_port_names = set()
+            for pair in model.port_symmetries:
+                for item in pair:
+                    name_ = item[0] if isinstance(item, tuple) else item
+                    model_port_names.add(name_)
+            optical_ports = {p for p in c.ports if not p.startswith("e")}
+            assert model_port_names == optical_ports, (
+                f"{name}: Tidy3D model ports {model_port_names} != optical ports {optical_ports}"
+            )

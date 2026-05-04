@@ -10,7 +10,12 @@ components = {}
 ####################################################################
 def SOI220nm_1550nm_TE_RIB_2x1_MMI(tech: pf.Technology) -> pf.Component:
     """2x1 MMI splitter, TE RIB waveguide, 1550 nm."""
-    return _import_component_with_ports("SOI220nm_1550nm_TE_RIB_2x1_MMI", tech)
+    mmi = _import_component_with_ports("SOI220nm_1550nm_TE_RIB_2x1_MMI", tech)
+    ports = list(mmi.ports.items())
+    mmi.add_model(
+        pf.Tidy3DModel(port_symmetries=[(ports[0], ports[1]), (ports[0], ports[2])]), "Tidy3D"
+    )
+    return mmi
 
 
 components["SOI220nm_1550nm_TE_RIB_2x1_MMI"] = SOI220nm_1550nm_TE_RIB_2x1_MMI
@@ -19,7 +24,20 @@ components["SOI220nm_1550nm_TE_RIB_2x1_MMI"] = SOI220nm_1550nm_TE_RIB_2x1_MMI
 ####################################################################
 def SOI220nm_1550nm_TE_RIB_2x2_MMI(tech: pf.Technology) -> pf.Component:
     """2x2 MMI splitter, TE RIB waveguide, 1550 nm."""
-    return _import_component_with_ports("SOI220nm_1550nm_TE_RIB_2x2_MMI", tech)
+    mmi = _import_component_with_ports("SOI220nm_1550nm_TE_RIB_2x2_MMI", tech)
+    ports = list(mmi.ports.items())
+    mmi.add_model(
+        pf.Tidy3DModel(
+            port_symmetries=[
+                (ports[0], ports[2]),
+                (ports[0], ports[3]),
+                (ports[1], ports[2]),
+                (ports[1], ports[3]),
+            ]
+        ),
+        "Tidy3D",
+    )
+    return mmi
 
 
 components["SOI220nm_1550nm_TE_RIB_2x2_MMI"] = SOI220nm_1550nm_TE_RIB_2x2_MMI
@@ -28,7 +46,10 @@ components["SOI220nm_1550nm_TE_RIB_2x2_MMI"] = SOI220nm_1550nm_TE_RIB_2x2_MMI
 ####################################################################
 def SOI220nm_1550nm_TE_RIB_90_Degree_Bend(tech: pf.Technology) -> pf.Component:
     """90-degree bend, TE RIB waveguide, 1550 nm."""
-    return _import_component_with_ports("SOI220nm_1550nm_TE_RIB_90_Degree_Bend", tech)
+    bend = _import_component_with_ports("SOI220nm_1550nm_TE_RIB_90_Degree_Bend", tech)
+    ports = list(bend.ports.items())
+    bend.add_model(pf.Tidy3DModel(port_symmetries=[(ports[0], ports[1])]), "Tidy3D")
+    return bend
 
 
 components["SOI220nm_1550nm_TE_RIB_90_Degree_Bend"] = SOI220nm_1550nm_TE_RIB_90_Degree_Bend
@@ -37,6 +58,7 @@ components["SOI220nm_1550nm_TE_RIB_90_Degree_Bend"] = SOI220nm_1550nm_TE_RIB_90_
 ####################################################################
 def SOI220nm_1550nm_TE_RIB_EBL_Apodised_Grating_Coupler(tech: pf.Technology) -> pf.Component:
     """EBL apodised grating coupler, TE RIB waveguide, 1550 nm."""
+    # TODO: Add port symmetries once fiber ports are added to the component definition
     return _import_component_with_ports("SOI220nm_1550nm_TE_RIB_EBL_Apodised_Grating_Coupler", tech)
 
 
@@ -47,7 +69,12 @@ components["SOI220nm_1550nm_TE_RIB_EBL_Apodised_Grating_Coupler"] = (
 
 ####################################################################
 def SOI220nm_1550nm_TE_RIB_Grating_Coupler(tech: pf.Technology) -> pf.Component:
-    """Grating coupler, TE RIB waveguide, 1550 nm."""
+    """Grating coupler, TE RIB waveguide, 1550 nm.
+
+    Note:
+        Model will be implemented when fiber ports are added to the component definition.
+
+    """
     return _import_component_with_ports("SOI220nm_1550nm_TE_RIB_Grating_Coupler", tech)
 
 
@@ -56,7 +83,13 @@ components["SOI220nm_1550nm_TE_RIB_Grating_Coupler"] = SOI220nm_1550nm_TE_RIB_Gr
 
 ####################################################################
 def SOI220nm_1550nm_TE_RIB_MZI(tech: pf.Technology) -> pf.Component:
-    """Mach-Zehnder interferometer, TE RIB waveguide, 1550 nm."""
+    """Mach-Zehnder interferometer, TE RIB waveguide, 1550 nm.
+
+    Note:
+        This component only has electrical ports as its optical ports are
+        routed to gratted couplers.
+
+    """
     return _import_component_with_ports("SOI220nm_1550nm_TE_RIB_MZI", tech)
 
 
@@ -66,7 +99,10 @@ components["SOI220nm_1550nm_TE_RIB_MZI"] = SOI220nm_1550nm_TE_RIB_MZI
 ####################################################################
 def SOI220nm_1550nm_TE_RIB_Waveguide(tech: pf.Technology) -> pf.Component:
     """Straight waveguide, TE RIB, 1550 nm."""
-    return _import_component_with_ports("SOI220nm_1550nm_TE_RIB_Waveguide", tech)
+    straight = _import_component_with_ports("SOI220nm_1550nm_TE_RIB_Waveguide", tech)
+    ports = list(straight.ports.items())
+    straight.add_model(pf.Tidy3DModel(port_symmetries=[(ports[0], ports[1])]), "Tidy3D")
+    return straight
 
 
 components["SOI220nm_1550nm_TE_RIB_Waveguide"] = SOI220nm_1550nm_TE_RIB_Waveguide
@@ -75,7 +111,12 @@ components["SOI220nm_1550nm_TE_RIB_Waveguide"] = SOI220nm_1550nm_TE_RIB_Waveguid
 ####################################################################
 def SOI220nm_1550nm_TE_RIB_Waveguide_Crossing(tech: pf.Technology) -> pf.Component:
     """Waveguide crossing, TE RIB, 1550 nm."""
-    return _import_component_with_ports("SOI220nm_1550nm_TE_RIB_Waveguide_Crossing", tech)
+    crossing = _import_component_with_ports("SOI220nm_1550nm_TE_RIB_Waveguide_Crossing", tech)
+    ports = list(crossing.ports.items())
+    crossing.add_model(
+        pf.Tidy3DModel(port_symmetries=[(ports[0], ports[2]), (ports[1], ports[3])]), "Tidy3D"
+    )
+    return crossing
 
 
 components["SOI220nm_1550nm_TE_RIB_Waveguide_Crossing"] = SOI220nm_1550nm_TE_RIB_Waveguide_Crossing
@@ -84,7 +125,12 @@ components["SOI220nm_1550nm_TE_RIB_Waveguide_Crossing"] = SOI220nm_1550nm_TE_RIB
 ####################################################################
 def SOI220nm_1550nm_TE_STRIP_2x1_MMI(tech: pf.Technology) -> pf.Component:
     """2x1 MMI splitter, TE STRIP waveguide, 1550 nm."""
-    return _import_component_with_ports("SOI220nm_1550nm_TE_STRIP_2x1_MMI", tech)
+    mmi = _import_component_with_ports("SOI220nm_1550nm_TE_STRIP_2x1_MMI", tech)
+    ports = list(mmi.ports.items())
+    mmi.add_model(
+        pf.Tidy3DModel(port_symmetries=[(ports[0], ports[1]), (ports[0], ports[2])]), "Tidy3D"
+    )
+    return mmi
 
 
 components["SOI220nm_1550nm_TE_STRIP_2x1_MMI"] = SOI220nm_1550nm_TE_STRIP_2x1_MMI
@@ -93,7 +139,20 @@ components["SOI220nm_1550nm_TE_STRIP_2x1_MMI"] = SOI220nm_1550nm_TE_STRIP_2x1_MM
 ####################################################################
 def SOI220nm_1550nm_TE_STRIP_2x2_MMI(tech: pf.Technology) -> pf.Component:
     """2x2 MMI splitter, TE STRIP waveguide, 1550 nm."""
-    return _import_component_with_ports("SOI220nm_1550nm_TE_STRIP_2x2_MMI", tech)
+    mmi = _import_component_with_ports("SOI220nm_1550nm_TE_STRIP_2x2_MMI", tech)
+    ports = list(mmi.ports.items())
+    mmi.add_model(
+        pf.Tidy3DModel(
+            port_symmetries=[
+                (ports[0], ports[2]),
+                (ports[0], ports[3]),
+                (ports[1], ports[2]),
+                (ports[1], ports[3]),
+            ]
+        ),
+        "Tidy3D",
+    )
+    return mmi
 
 
 components["SOI220nm_1550nm_TE_STRIP_2x2_MMI"] = SOI220nm_1550nm_TE_STRIP_2x2_MMI
@@ -102,7 +161,10 @@ components["SOI220nm_1550nm_TE_STRIP_2x2_MMI"] = SOI220nm_1550nm_TE_STRIP_2x2_MM
 ####################################################################
 def SOI220nm_1550nm_TE_STRIP_90_Degree_Bend(tech: pf.Technology) -> pf.Component:
     """90-degree bend, TE STRIP waveguide, 1550 nm."""
-    return _import_component_with_ports("SOI220nm_1550nm_TE_STRIP_90_Degree_Bend", tech)
+    bend = _import_component_with_ports("SOI220nm_1550nm_TE_STRIP_90_Degree_Bend", tech)
+    ports = list(bend.ports.items())
+    bend.add_model(pf.Tidy3DModel(port_symmetries=[(ports[0], ports[1])]), "Tidy3D")
+    return bend
 
 
 components["SOI220nm_1550nm_TE_STRIP_90_Degree_Bend"] = SOI220nm_1550nm_TE_STRIP_90_Degree_Bend
@@ -110,7 +172,13 @@ components["SOI220nm_1550nm_TE_STRIP_90_Degree_Bend"] = SOI220nm_1550nm_TE_STRIP
 
 ####################################################################
 def SOI220nm_1550nm_TE_STRIP_Grating_Coupler(tech: pf.Technology) -> pf.Component:
-    """Grating coupler, TE STRIP waveguide, 1550 nm."""
+    """Grating coupler, TE STRIP waveguide, 1550 nm.
+
+    Note:
+        Model will be implemented when fiber ports are added to the component definition.
+
+    """
+    # TODO: Add port symmetries once fiber ports are added to the component definition
     return _import_component_with_ports("SOI220nm_1550nm_TE_STRIP_Grating_Coupler", tech)
 
 
@@ -119,7 +187,13 @@ components["SOI220nm_1550nm_TE_STRIP_Grating_Coupler"] = SOI220nm_1550nm_TE_STRI
 
 ####################################################################
 def SOI220nm_1550nm_TE_STRIP_MZI(tech: pf.Technology) -> pf.Component:
-    """Mach-Zehnder interferometer, TE STRIP waveguide, 1550 nm."""
+    """Mach-Zehnder interferometer, TE STRIP waveguide, 1550 nm.
+
+    Note:
+        This component only has electrical ports as its optical ports are
+        routed to gratted couplers.
+
+    """
     return _import_component_with_ports("SOI220nm_1550nm_TE_STRIP_MZI", tech)
 
 
@@ -129,7 +203,10 @@ components["SOI220nm_1550nm_TE_STRIP_MZI"] = SOI220nm_1550nm_TE_STRIP_MZI
 ####################################################################
 def SOI220nm_1550nm_TE_STRIP_Waveguide(tech: pf.Technology) -> pf.Component:
     """Straight waveguide, TE STRIP, 1550 nm."""
-    return _import_component_with_ports("SOI220nm_1550nm_TE_STRIP_Waveguide", tech)
+    straight = _import_component_with_ports("SOI220nm_1550nm_TE_STRIP_Waveguide", tech)
+    ports = list(straight.ports.items())
+    straight.add_model(pf.Tidy3DModel(port_symmetries=[(ports[0], ports[1])]), "Tidy3D")
+    return straight
 
 
 components["SOI220nm_1550nm_TE_STRIP_Waveguide"] = SOI220nm_1550nm_TE_STRIP_Waveguide

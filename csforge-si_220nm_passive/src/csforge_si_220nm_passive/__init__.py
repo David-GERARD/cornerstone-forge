@@ -1,12 +1,16 @@
 """This module contains the implementation of Cornerstone's SI 220nm passive PDK."""
 
-from .allband import component_names as allband_component_names
-from .allband import components as allband_components
-from .cband import component_names as cband_component_names
-from .cband import components as cband_components
-from .component import component, component_names, components
-from .oband import component_names as oband_component_names
-from .oband import components as oband_components
+from .component import (
+    allband_component_names,  # List of component names that are band-agnostic.
+    allband_components,  # Dictionary of band-agnostic component factory functions.
+    cband_component_names,  # List of component names specific to the C-band (1550 nm).
+    cband_components,  # Dictionary of C-band component factory functions.
+    component,  # This is the main entry point for users to access components by name.
+    component_names,  # A list of all available component names in the library.
+    components,  # A dictionary mapping component names to their factory functions.
+    oband_component_names,  # List of component names specific to the O-band (1310 nm).
+    oband_components,  # Dictionary of O-band component factory functions.
+)
 from .technology import csforge_si_220nm_pdk, technology_version
 
 __version__ = technology_version

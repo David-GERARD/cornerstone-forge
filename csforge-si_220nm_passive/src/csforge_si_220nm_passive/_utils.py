@@ -6,15 +6,10 @@ import warnings
 import photonforge as pf
 import yaml
 
-from .technology import csforge_si_220nm_pdk
-
-tech = csforge_si_220nm_pdk()
-pf.config.default_technology = tech
-
 _GDS_DIR = pathlib.Path(__file__).parent / "gds"
 
 
-def _import_component_with_ports(component_name: str) -> pf.Component:
+def _import_component_with_ports(component_name: str, tech: pf.Technology) -> pf.Component:
     """Import a PDK component from its GDS file and attach its ports from the YAML spec.
 
     Looks for ``<component_name>.gds`` and ``<component_name>.yaml`` in the
@@ -28,6 +23,7 @@ def _import_component_with_ports(component_name: str) -> pf.Component:
         component_name: Name of the component, matching the GDS cell name and
             the stem of the ``.gds`` / ``.yaml`` files (e.g.
             ``"SOI220nm_1310nm_TE_RIB_2x1_MMI"``).
+        tech: The technology to use for loading the GDS and interpreting the port specs.
 
     Returns:
         The loaded component with optical and electrical ports attached.
@@ -45,7 +41,7 @@ def _import_component_with_ports(component_name: str) -> pf.Component:
     if not gds_path.exists():
         raise FileNotFoundError(f"GDS file not found: {gds_path}")
 
-    components = pf.load_layout(str(gds_path))
+    components = pf.load_layout(str(gds_path), technology=tech)
     component = components[component_name]
 
     if not yaml_path.exists():
@@ -67,7 +63,7 @@ def _import_component_with_ports(component_name: str) -> pf.Component:
         port = pf.Port(
             center=port_def["center"],
             input_direction=input_direction,
-            spec=port_def["cross_section"],
+            spec=tech.ports[port_def["cross_section"]],
         )
         component.add_port(port, port_def["name"])
 

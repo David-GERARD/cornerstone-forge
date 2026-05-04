@@ -8,18 +8,21 @@ from .parametric.floorplan import (
     floorplan_5_5mm_x_4_9mm,
     floorplan_11_47mm_x_4_9mm,
 )
+from .technology import csforge_si_220nm_pdk
 
 components = {
-    "floorplan": floorplan(),
-    "floorplan_11_47mm_x_4_9mm": floorplan_11_47mm_x_4_9mm(),
-    "floorplan_5_5mm_x_4_9mm": floorplan_5_5mm_x_4_9mm(),
+    "floorplan": floorplan(tech=csforge_si_220nm_pdk()),
+    "floorplan_11_47mm_x_4_9mm": floorplan_11_47mm_x_4_9mm(tech=csforge_si_220nm_pdk()),
+    "floorplan_5_5mm_x_4_9mm": floorplan_5_5mm_x_4_9mm(tech=csforge_si_220nm_pdk()),
 }
 
 
 ####################################################################
 def Cell0_SOI220_Full_1550nm_Packaging_Template() -> pf.Component:
     """2x1 MMI splitter, TE RIB waveguide, 1310 nm."""
-    return _import_component_with_ports("Cell0_SOI220_Full_1550nm_Packaging_Template")
+    return _import_component_with_ports(
+        "Cell0_SOI220_Full_1550nm_Packaging_Template", csforge_si_220nm_pdk()
+    )
 
 
 components["Cell0_SOI220_Full_1550nm_Packaging_Template"] = (

@@ -10,6 +10,26 @@ from csforge_si_220nm_passive._layers import _connections, _layer_specs, _thickn
 from csforge_si_220nm_passive._ports import _ports
 from csforge_si_220nm_passive.technology import csforge_si_220nm_pdk
 
+# ---------------------------------------------------------------------------
+# Load technology test
+# ---------------------------------------------------------------------------
+
+
+def test_load_technology():
+    """Test that the technology can be loaded without errors."""
+    tech = pdk.csforge_si_220nm_pdk()
+    pf.config.default_technology = tech
+    print(
+        f"Loaded technology '{tech.name}' version"
+        f"{tech.version} with {len(tech.layers)} layers"
+        f" and {len(tech.ports)} port specs."
+    )
+
+
+# ---------------------------------------------------------------------------
+# Export test
+# ---------------------------------------------------------------------------
+
 
 def test_export(tmp_path):
     """Test that the technology can be exported and re-imported without loss of information."""

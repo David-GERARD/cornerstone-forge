@@ -14,45 +14,52 @@ def _port_names(component: pf.Component) -> list[str]:
     return sorted(component.ports.keys())
 
 
+@pytest.fixture(scope="module")
+def load_technology() -> None:
+    """Load the technology once for all tests."""
+    tech = pdk.csforge_si_220nm_pdk()
+    pf.config.default_technology = tech
+
+
 # ---------------------------------------------------------------------------
 # Component catalogue
 # ---------------------------------------------------------------------------
 
 
-def test_components():
+def test_components(load_technology):
     """Test that all components can be instantiated without errors."""
     for name in pdk.component_names:
         component = pdk.components[name]
         assert isinstance(component, pf.Component), f"{name} did not return a Component"
 
 
-def test_oband_components():
+def test_oband_components(load_technology):
     """Test that all O-band components can be instantiated without errors."""
     for name in pdk.oband_component_names:
         component = pdk.components[name]
         assert isinstance(component, pf.Component), f"{name} did not return a Component"
 
 
-def test_cband_components():
+def test_cband_components(load_technology):
     """Test that all C-band components can be instantiated without errors."""
     for name in pdk.cband_component_names:
         component = pdk.components[name]
         assert isinstance(component, pf.Component), f"{name} did not return a Component"
 
 
-def test_allband_components():
+def test_allband_components(load_technology):
     """Test that all band-agnostic components can be instantiated without errors."""
     for name in pdk.allband_component_names:
         component = pdk.components[name]
         assert isinstance(component, pf.Component), f"{name} did not return a Component"
 
 
-def test_component_names_non_empty():
+def test_component_names_non_empty(load_technology):
     """Test that the component catalogue contains at least one entry."""
     assert len(pdk.component_names) > 0, "component_names must not be empty"
 
 
-def test_oband_and_cband_and_allband_disjoint():
+def test_oband_and_cband_and_allband_disjoint(load_technology):
     """Test that O-band, C-band, and All-band catalogues share no component names."""
     overlap = (
         set(pdk.oband_component_names)
@@ -62,7 +69,7 @@ def test_oband_and_cband_and_allband_disjoint():
     assert overlap == set(), f"Bands share component names: {overlap}"
 
 
-def test_all_components_covered():
+def test_all_components_covered(load_technology):
     """Test that the combined catalogue equals oband + cband + allband."""
     combined = set(
         pdk.oband_component_names + pdk.cband_component_names + pdk.allband_component_names
@@ -78,7 +85,7 @@ _OBAND_PREFIX = "SOI220nm_1310nm_"
 _CBAND_PREFIX = "SOI220nm_1550nm_"
 
 
-def test_oband_naming_convention():
+def test_oband_naming_convention(load_technology):
     """Test that all O-band names start with the 1310 nm prefix."""
     for name in pdk.oband_component_names:
         assert name.startswith(_OBAND_PREFIX), (
@@ -86,7 +93,7 @@ def test_oband_naming_convention():
         )
 
 
-def test_cband_naming_convention():
+def test_cband_naming_convention(load_technology):
     """Test that all C-band names start with the 1550 nm prefix."""
     for name in pdk.cband_component_names:
         assert name.startswith(_CBAND_PREFIX), (

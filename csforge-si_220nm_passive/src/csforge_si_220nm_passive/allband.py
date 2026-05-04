@@ -4,15 +4,15 @@ import photonforge as pf
 
 from ._utils import _import_component_with_ports
 from .parametric.floorplan import (
-    SOI220nm_Floorplan,
-    SOI220nm_Floorplan_5_5mm_x_4_9mm,
-    SOI220nm_Floorplan_11_47mm_x_4_9mm,
+    floorplan,
+    floorplan_5_5mm_x_4_9mm,
+    floorplan_11_47mm_x_4_9mm,
 )
 
 components = {
-    "SOI220nm_Floorplan": SOI220nm_Floorplan(),
-    "SOI220nm_Floorplan_11_47mm_x_4_9mm": SOI220nm_Floorplan_11_47mm_x_4_9mm(),
-    "SOI220nm_Floorplan_5_5mm_x_4_9mm": SOI220nm_Floorplan_5_5mm_x_4_9mm(),
+    "floorplan": floorplan(),
+    "floorplan_11_47mm_x_4_9mm": floorplan_11_47mm_x_4_9mm(),
+    "floorplan_5_5mm_x_4_9mm": floorplan_5_5mm_x_4_9mm(),
 }
 
 

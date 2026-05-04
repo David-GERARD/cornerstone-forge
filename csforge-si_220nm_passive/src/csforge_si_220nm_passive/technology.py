@@ -22,6 +22,8 @@ from ._ports import _ports
 
 _MediumType = pft.Medium | dict[Literal["optical", "electrical"], pft.Medium]
 
+technology_version = "0.2.0"
+
 
 @pf.parametric_technology
 def csforge_si_220nm_pdk(
@@ -317,7 +319,7 @@ def csforge_si_220nm_pdk(
 
     technology = pf.Technology(
         name="csforge_si_220nm_passive",
-        version="0.1.0",
+        version=technology_version,
         layers=layers,
         extrusion_specs=extrusion_specs,
         ports=_ports(thicknesses),

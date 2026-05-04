@@ -1,6 +1,6 @@
 [project]
 name = "csforge-si_220nm_passive"
-version = "0.1.0"
+version = "0.2.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [
@@ -8,6 +8,9 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [] # Dependencies are managed at the workspace level
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
 
 [build-system]
 requires = ["uv_build>=0.11.7,<0.12.0"]

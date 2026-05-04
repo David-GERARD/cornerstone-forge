@@ -1,23 +1,15 @@
 """This module contains the implementation of Cornerstone's SI 220nm passive PDK."""
 
-import pathlib
-
-import tomllib
-
 from .cband import component_names as cband_component_names
 from .cband import components as cband_components
 from .oband import component_names as oband_component_names
 from .oband import components as oband_components
-from .technology import csforge_si_220nm_pdk
+from .technology import csforge_si_220nm_pdk, technology_version
 
 components = oband_components | cband_components
 component_names = oband_component_names + cband_component_names
 
-# Set version from pyproject.toml
-pyproject_path = pathlib.Path(__file__).parents[2] / "pyproject.toml"
-with open(pyproject_path, "rb") as f:
-    data = tomllib.load(f)
-    __version__ = data["project"]["version"]
+__version__ = technology_version
 
 
 def plot_cross_section(technology=None):

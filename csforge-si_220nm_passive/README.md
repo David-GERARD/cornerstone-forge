@@ -2,8 +2,10 @@
 
 [PhotonForge](https://docs.flexcompute.com/projects/photonforge/en/latest/) PDK for **Cornerstone's SOI 220 nm passive process**.
 
-Provides a parametric `pf.Technology` definition and a complete component catalogue covering O-band (1310 nm) and C-band (1550 nm), backed by Cornerstone GDS cells and YAML port specs.
+Provides a parametric `pf.Technology` definition and a complete component catalogue covering O-band (1310 nm), C-band (1550 nm), and band-agnostic components, backed by Cornerstone GDS cells and YAML port specs.
 Process data sourced from [cornerstone-uos/cornerstone-pdk](https://github.com/cornerstone-uos/cornerstone-pdk/tree/main/Si_220nm_passive).
+
+The design goal is that **the technology is defined once by the user** and passed explicitly to each component factory — no global state is required.
 
 ---
 
@@ -13,16 +15,18 @@ Process data sourced from [cornerstone-uos/cornerstone-pdk](https://github.com/c
 import photonforge as pf
 import csforge_si_220nm_passive as pdk
 
-# Build the technology and set it globally
+# Build the technology once
 tech = pdk.csforge_si_220nm_pdk()
+
+# Instantiate components by name, passing the technology explicitly
+wg  = pdk.component("SOI220nm_1550nm_TE_STRIP_Waveguide", technology=tech)
+mmi = pdk.component("SOI220nm_1550nm_TE_STRIP_2x1_MMI",  technology=tech)
+print(list(wg.ports.keys()))   # ['o1', 'o2']
+print(list(mmi.ports.keys()))  # ['o1', 'o2', 'o3']
+
+# Or set a global default so technology can be omitted
 pf.config.default_technology = tech
-
-# List all available component names
-print(pdk.component_names)
-
-# Fetch and inspect a component
-wg = pdk.components["SOI220nm_1550nm_TE_STRIP_Waveguide"]
-print(list(wg.ports.keys()))  # ['o1', 'o2']
+wg = pdk.component("SOI220nm_1550nm_TE_STRIP_Waveguide")
 ```
 
 ---
@@ -149,20 +153,54 @@ All parameters have process-nominal defaults and can be overridden individually:
 
 **Note on MZI ports:** The MZI components expose electrical `dc` ports (`e1`, `e2`) for the integrated TiN heater. The waveguide input/output connections are internal to the GDS cell.
 
+### Band-agnostic components
+
+| Component | Type |
+|-----------|------|
+| `floorplan` | Parametric floorplan |
+| `floorplan_5_5mm_x_4_9mm` | Fixed 5.5 × 4.9 mm floorplan |
+| `floorplan_11_47mm_x_4_9mm` | Fixed 11.47 × 4.9 mm floorplan |
+| `Cell0_SOI220_Full_1550nm_Packaging_Template` | Full-chip packaging template |
+
 ---
 
 ## Package API
 
+### `component(cell_name, technology=None, **kwargs) → pf.Component`
+
+The primary entry point for loading components. Instantiates the named component
+using the supplied `technology`, or falls back to `pf.config.default_technology`
+if `technology` is `None`. Issues a `RuntimeWarning` when the default technology
+name does not match the PDK.
+
+```python
+tech = pdk.csforge_si_220nm_pdk()
+
+# Explicit technology (recommended)
+wg = pdk.component("SOI220nm_1550nm_TE_STRIP_Waveguide", technology=tech)
+
+# Via global default
+pf.config.default_technology = tech
+wg = pdk.component("SOI220nm_1550nm_TE_STRIP_Waveguide")
+```
+
+### Other names
+
 ```python
 import csforge_si_220nm_passive as pdk
 
-pdk.csforge_si_220nm_pdk    # parametric technology factory
-pdk.components              # dict[str, pf.Component] — all components
-pdk.component_names         # list[str] — all names (oband + cband)
-pdk.oband_components        # dict — O-band components
-pdk.oband_component_names   # list — O-band names
-pdk.cband_components        # dict — C-band components
-pdk.cband_component_names   # list — C-band names
-pdk.__version__             # str — version from pyproject.toml
-pdk.plot_cross_section()    # Tidy3D cross-section visualisation
+pdk.csforge_si_220nm_pdk       # parametric technology factory
+pdk.components                 # dict[str, Callable] — all component factories
+pdk.component_names            # list[str] — all names (oband + cband + allband)
+pdk.oband_components           # dict[str, Callable] — O-band factories
+pdk.oband_component_names      # list[str] — O-band names
+pdk.cband_components           # dict[str, Callable] — C-band factories
+pdk.cband_component_names      # list[str] — C-band names
+pdk.allband_components         # dict[str, Callable] — band-agnostic factories
+pdk.allband_component_names    # list[str] — band-agnostic names
+pdk.__version__                # str — technology version
+pdk.plot_cross_section()       # Tidy3D cross-section visualisation
 ```
+
+Each entry in `pdk.components` is a **callable factory** `(tech: pf.Technology, **kwargs) -> pf.Component`.
+Use `pdk.component(name, technology=tech)` rather than calling the factories directly.

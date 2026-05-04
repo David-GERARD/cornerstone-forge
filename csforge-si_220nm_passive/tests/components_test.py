@@ -1,4 +1,4 @@
-"""Tests for the csforge_si_220nm_passive component functions."""
+"""Tests for the csforge_si_220nm_passive component catalogue and component() entry point."""
 
 import csforge_si_220nm_passive as pdk
 import photonforge as pf
@@ -15,77 +15,127 @@ def _port_names(component: pf.Component) -> list[str]:
 
 
 @pytest.fixture(scope="module")
-def load_technology() -> None:
-    """Load the technology once for all tests."""
-    tech = pdk.csforge_si_220nm_pdk()
-    pf.config.default_technology = tech
+def tech() -> pf.Technology:
+    """Build the PDK technology once for the entire module and set it as default."""
+    t = pdk.csforge_si_220nm_pdk()
+    pf.config.default_technology = t
+    return t
 
 
 # ---------------------------------------------------------------------------
-# Component catalogue
+# Component catalogue structure
 # ---------------------------------------------------------------------------
 
 
-def test_components(load_technology):
-    """Test that all components can be instantiated without errors."""
-    for name in pdk.component_names:
-        component = pdk.components[name]
-        assert isinstance(component, pf.Component), f"{name} did not return a Component"
+def test_components_are_callable():
+    """Test that every entry in the components dict is a callable factory."""
+    for name, factory in pdk.components.items():
+        assert callable(factory), f"components['{name}'] is not callable"
 
 
-def test_oband_components(load_technology):
-    """Test that all O-band components can be instantiated without errors."""
-    for name in pdk.oband_component_names:
-        component = pdk.components[name]
-        assert isinstance(component, pf.Component), f"{name} did not return a Component"
-
-
-def test_cband_components(load_technology):
-    """Test that all C-band components can be instantiated without errors."""
-    for name in pdk.cband_component_names:
-        component = pdk.components[name]
-        assert isinstance(component, pf.Component), f"{name} did not return a Component"
-
-
-def test_allband_components(load_technology):
-    """Test that all band-agnostic components can be instantiated without errors."""
-    for name in pdk.allband_component_names:
-        component = pdk.components[name]
-        assert isinstance(component, pf.Component), f"{name} did not return a Component"
-
-
-def test_component_names_non_empty(load_technology):
+def test_component_names_non_empty():
     """Test that the component catalogue contains at least one entry."""
-    assert len(pdk.component_names) > 0, "component_names must not be empty"
+    assert len(pdk.component_names) > 0
 
 
-def test_oband_and_cband_and_allband_disjoint(load_technology):
-    """Test that O-band, C-band, and All-band catalogues share no component names."""
-    overlap = (
-        set(pdk.oband_component_names)
-        & set(pdk.cband_component_names)
-        & set(pdk.allband_component_names)
-    )
-    assert overlap == set(), f"Bands share component names: {overlap}"
-
-
-def test_all_components_covered(load_technology):
-    """Test that the combined catalogue equals oband + cband + allband."""
+def test_all_components_covered():
+    """Test that component_names equals the union of all band catalogues."""
     combined = set(
         pdk.oband_component_names + pdk.cband_component_names + pdk.allband_component_names
     )
     assert combined == set(pdk.component_names)
 
 
+def test_band_catalogues_are_pairwise_disjoint():
+    """Test that no component name appears in more than one band catalogue."""
+    oband = set(pdk.oband_component_names)
+    cband = set(pdk.cband_component_names)
+    allband = set(pdk.allband_component_names)
+    overlaps = (oband & cband) | (oband & allband) | (cband & allband)
+    assert overlaps == set(), f"Band catalogues share component names: {overlaps}"
+
+
 # ---------------------------------------------------------------------------
-# Naming convention
+# component() entry point
+# ---------------------------------------------------------------------------
+
+
+def test_component_unknown_name_raises(tech):
+    """Test that requesting an unknown name raises ValueError."""
+    with pytest.raises(ValueError, match="not found in the library"):
+        pdk.component("does_not_exist", technology=tech)
+
+
+def test_component_uses_explicit_technology(tech):
+    """Test that component() accepts an explicit technology argument."""
+    name = pdk.oband_component_names[0]
+    c = pdk.component(name, technology=tech)
+    assert isinstance(c, pf.Component)
+
+
+def test_component_uses_default_technology(tech):
+    """Test that component() falls back to pf.config.default_technology."""
+    # tech fixture already set pf.config.default_technology
+    name = pdk.oband_component_names[0]
+    c = pdk.component(name)
+    assert isinstance(c, pf.Component)
+
+
+def test_component_warns_on_incompatible_technology():
+    """Test that component() warns when the default technology name is not recognised.
+
+    The warning is only issued when technology=None so the default is inspected.
+    The subsequent component load raises KeyError (missing port specs), which is
+    expected and suppressed here — only the warning is under test.
+    """
+    foreign_tech = pf.basic_technology()
+    saved = pf.config.default_technology
+    pf.config.default_technology = foreign_tech
+    try:
+        with pytest.warns(RuntimeWarning, match="does not seem compatible"):
+            try:
+                pdk.component(pdk.oband_component_names[0])
+            except Exception:
+                pass
+    finally:
+        pf.config.default_technology = saved
+
+
+# ---------------------------------------------------------------------------
+# Instantiation — all bands
+# ---------------------------------------------------------------------------
+
+
+def test_oband_components(tech):
+    """Test that every O-band component instantiates as a pf.Component."""
+    for name in pdk.oband_component_names:
+        c = pdk.component(name, technology=tech)
+        assert isinstance(c, pf.Component), f"{name} did not return a Component"
+
+
+def test_cband_components(tech):
+    """Test that every C-band component instantiates as a pf.Component."""
+    for name in pdk.cband_component_names:
+        c = pdk.component(name, technology=tech)
+        assert isinstance(c, pf.Component), f"{name} did not return a Component"
+
+
+def test_allband_components(tech):
+    """Test that every band-agnostic component instantiates as a pf.Component."""
+    for name in pdk.allband_component_names:
+        c = pdk.component(name, technology=tech)
+        assert isinstance(c, pf.Component), f"{name} did not return a Component"
+
+
+# ---------------------------------------------------------------------------
+# Naming conventions
 # ---------------------------------------------------------------------------
 
 _OBAND_PREFIX = "SOI220nm_1310nm_"
 _CBAND_PREFIX = "SOI220nm_1550nm_"
 
 
-def test_oband_naming_convention(load_technology):
+def test_oband_naming_convention():
     """Test that all O-band names start with the 1310 nm prefix."""
     for name in pdk.oband_component_names:
         assert name.startswith(_OBAND_PREFIX), (
@@ -93,7 +143,7 @@ def test_oband_naming_convention(load_technology):
         )
 
 
-def test_cband_naming_convention(load_technology):
+def test_cband_naming_convention():
     """Test that all C-band names start with the 1550 nm prefix."""
     for name in pdk.cband_component_names:
         assert name.startswith(_CBAND_PREFIX), (
@@ -102,50 +152,58 @@ def test_cband_naming_convention(load_technology):
 
 
 # ---------------------------------------------------------------------------
-# Port counts per component type
+# Port counts
 # ---------------------------------------------------------------------------
 
 
 @pytest.mark.parametrize("name", [n for n in pdk.component_names if "2x1_MMI" in n])
-def test_2x1_mmi_has_three_ports(name: str):
-    """Test that every 2x1 MMI has exactly three optical ports."""
-    component = pdk.components[name]
-    assert len(component.ports) == 3, f"{name} expected 3 ports, got {len(component.ports)}"
+def test_2x1_mmi_has_three_ports(tech, name: str):
+    """Test that every 2x1 MMI has exactly three ports."""
+    c = pdk.component(name, technology=tech)
+    assert len(c.ports) == 3, f"{name}: expected 3 ports, got {len(c.ports)}"
 
 
 @pytest.mark.parametrize("name", [n for n in pdk.component_names if "2x2_MMI" in n])
-def test_2x2_mmi_has_four_ports(name: str):
-    """Test that every 2x2 MMI has exactly four optical ports."""
-    component = pdk.components[name]
-    assert len(component.ports) == 4, f"{name} expected 4 ports, got {len(component.ports)}"
+def test_2x2_mmi_has_four_ports(tech, name: str):
+    """Test that every 2x2 MMI has exactly four ports."""
+    c = pdk.component(name, technology=tech)
+    assert len(c.ports) == 4, f"{name}: expected 4 ports, got {len(c.ports)}"
 
 
 @pytest.mark.parametrize("name", [n for n in pdk.component_names if "90_Degree_Bend" in n])
-def test_bend_has_two_ports(name: str):
+def test_bend_has_two_ports(tech, name: str):
     """Test that every 90-degree bend has exactly two ports."""
-    component = pdk.components[name]
-    assert len(component.ports) == 2, f"{name} expected 2 ports, got {len(component.ports)}"
+    c = pdk.component(name, technology=tech)
+    assert len(c.ports) == 2, f"{name}: expected 2 ports, got {len(c.ports)}"
 
 
 @pytest.mark.parametrize("name", [n for n in pdk.component_names if "Waveguide_Crossing" in n])
-def test_crossing_has_four_ports(name: str):
+def test_crossing_has_four_ports(tech, name: str):
     """Test that every waveguide crossing has exactly four ports."""
-    component = pdk.components[name]
-    assert len(component.ports) == 4, f"{name} expected 4 ports, got {len(component.ports)}"
+    c = pdk.component(name, technology=tech)
+    assert len(c.ports) == 4, f"{name}: expected 4 ports, got {len(c.ports)}"
 
 
 @pytest.mark.parametrize(
     "name",
     [n for n in pdk.component_names if "Waveguide" in n and "Crossing" not in n],
 )
-def test_waveguide_has_two_ports(name: str):
+def test_waveguide_has_two_ports(tech, name: str):
     """Test that every straight waveguide has exactly two ports."""
-    component = pdk.components[name]
-    assert len(component.ports) == 2, f"{name} expected 2 ports, got {len(component.ports)}"
+    c = pdk.component(name, technology=tech)
+    assert len(c.ports) == 2, f"{name}: expected 2 ports, got {len(c.ports)}"
 
 
 @pytest.mark.parametrize("name", [n for n in pdk.component_names if "Grating_Coupler" in n])
-def test_grating_coupler_has_one_port(name: str):
+def test_grating_coupler_has_one_port(tech, name: str):
     """Test that every grating coupler has exactly one port."""
-    component = pdk.components[name]
-    assert len(component.ports) == 1, f"{name} expected 1 port, got {len(component.ports)}"
+    c = pdk.component(name, technology=tech)
+    assert len(c.ports) == 1, f"{name}: expected 1 port, got {len(c.ports)}"
+
+
+@pytest.mark.parametrize("name", [n for n in pdk.component_names if "_MZI" in n])
+def test_mzi_has_two_electrical_ports(tech, name: str):
+    """Test that every MZI exposes exactly two electrical ports named e1 and e2."""
+    c = pdk.component(name, technology=tech)
+    assert len(c.ports) == 2, f"{name}: expected 2 ports, got {len(c.ports)}"
+    assert _port_names(c) == ["e1", "e2"]

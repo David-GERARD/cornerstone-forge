@@ -4,14 +4,24 @@ from .allband import component_names as allband_component_names
 from .allband import components as allband_components
 from .cband import component_names as cband_component_names
 from .cband import components as cband_components
+from .component import component, component_names, components
 from .oband import component_names as oband_component_names
 from .oband import components as oband_components
 from .technology import csforge_si_220nm_pdk, technology_version
 
-components = oband_components | cband_components | allband_components
-component_names = oband_component_names + cband_component_names + allband_component_names
-
 __version__ = technology_version
+__all__ = [
+    "allband_component_names",
+    "allband_components",
+    "cband_component_names",
+    "cband_components",
+    "component",
+    "component_names",
+    "components",
+    "csforge_si_220nm_pdk",
+    "oband_component_names",
+    "oband_components",
+]
 
 
 def plot_cross_section(technology=None):

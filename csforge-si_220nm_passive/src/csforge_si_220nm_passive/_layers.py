@@ -82,7 +82,7 @@ _layer_specs = {
             "[Si_Etch0_EBL_DF_94nm] EBL-defined grating couplers."
             "Dark-field: layer will be etched. For gaps > 0.35, there is no max feature size."
         ),
-        color="#008050",
+        color="#00805018",
         pattern=patterns["I15"],
     ),
     "grating_duv": pf.LayerSpec(
@@ -90,7 +90,7 @@ _layer_specs = {
         description=(
             "[Si_Etch1_DUV_DF_70nm] DUV-defined grating couplers. Dark-field: layer will be etched."
         ),
-        color="#cc78ff",
+        color="#cc78ff18",
         pattern=patterns["I6"],
     ),
     "wg_lf": pf.LayerSpec(
@@ -99,7 +99,7 @@ _layer_specs = {
             "[Si_Etch2_LF_120nm] Waveguide layer, defines both strip and rib. "
             "Light-field: layer will be protected."
         ),
-        color="#ff80a8",
+        color="#ff80a818",
         pattern=patterns["I6"],
     ),
     "wg_df": pf.LayerSpec(
@@ -108,7 +108,7 @@ _layer_specs = {
             "[Si_Etch2_DF_120nm] Waveguide layer, defines both strip and rib. "
             "Dark-field: layer will be etched."
         ),
-        color="#8183ff",
+        color="#8183ff18",
         pattern=patterns["I6"],
     ),
     "rib_slab": pf.LayerSpec(
@@ -116,7 +116,7 @@ _layer_specs = {
         description=(
             "[Si_Etch3_LF_100nm_to_BOX] Rib protect layer. Light-field: layer will be protected."
         ),
-        color="#80a8ff",
+        color="#80a8ff18",
         pattern=patterns["I6"],
     ),
     "heater_fil": pf.LayerSpec(
@@ -124,7 +124,7 @@ _layer_specs = {
         description=(
             "[Heat_Fil_LF] Heater filaments (light). Light-field: layer will become metal."
         ),
-        color="#9580ff",
+        color="#9580ff18",
         pattern=patterns["I9"],
     ),
     "contact_pad": pf.LayerSpec(
@@ -132,13 +132,13 @@ _layer_specs = {
         description=(
             "[Heat_CP_LF] Heater contact pads (light). Light-field: layer will become metal."
         ),
-        color="#80a8ff",
+        color="#80a8ff18",
         pattern=patterns["I10"],
     ),
     "FloorPlan": pf.LayerSpec(
         layer=(99, 0),
         description=("[FloorPlan] Cell outline"),
-        color="#f3ff80",
+        color="#f3ff8018",
         pattern=patterns["I1"],
     ),
     "Label_Etch_DF": pf.LayerSpec(
@@ -148,7 +148,7 @@ _layer_specs = {
             "Dark-field: layer will be etched"
             "Will not be checked in DRC."
         ),
-        color="#8000ff",
+        color="#8000ff18",
         pattern=patterns["I1"],
     ),
 }

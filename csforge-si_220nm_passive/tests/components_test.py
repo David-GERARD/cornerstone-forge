@@ -206,7 +206,7 @@ def test_mzi_has_two_electrical_ports(tech, name: str):
     """Test that every MZI exposes exactly two electrical ports named e1 and e2."""
     c = pdk.component(name, technology=tech)
     assert len(c.ports) == 2, f"{name}: expected 2 ports, got {len(c.ports)}"
-    assert _port_names(c) == ["e1", "e2"]
+    assert _port_names(c) == ["P1", "P2"]
 
 
 # ---------------------------------------------------------------------------

@@ -65,6 +65,6 @@ def _import_component_with_ports(component_name: str, tech: pf.Technology) -> pf
             input_direction=input_direction,
             spec=tech.ports[port_def["cross_section"]],
         )
-        component.add_port(port, port_def["name"])
+        component.add_port(port, f"P{port_def['name'][1:]}")
 
     return component

@@ -296,7 +296,7 @@ source = { editable = "csforge-si_220nm_active" }
 
 [[package]]
 name = "csforge-si-220nm-passive"
-version = "0.2.7"
+version = "0.2.8"
 source = { editable = "csforge-si_220nm_passive" }
 
 [[package]]

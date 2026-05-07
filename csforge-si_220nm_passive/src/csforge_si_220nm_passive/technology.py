@@ -22,7 +22,7 @@ from ._ports import _ports
 
 _MediumType = pft.Medium | dict[Literal["optical", "electrical"], pft.Medium]
 
-technology_version = "0.2.7"
+technology_version = "0.2.8"
 
 
 @pf.parametric_technology
@@ -408,8 +408,8 @@ if __name__ == "__main__":
         polarization_angle=0,  # for TE mode, in this case
     )
     c2.add_port(gaussian_port)
-    viewer(c2)
-    ax1 = pf.tidy3d_plot(c2, x=0.2)
+    viewer(c)
+    ax1 = pf.tidy3d_plot(c, y=2.0)
 
     plt.show()
     # print(tech.ports)

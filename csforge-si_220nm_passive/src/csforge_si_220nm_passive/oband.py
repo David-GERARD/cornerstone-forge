@@ -2,7 +2,7 @@
 
 import photonforge as pf
 
-from ._utils import _import_component_with_ports
+from ._utils import _import_component_with_ports, _load_data_model
 
 components = {}
 
@@ -14,6 +14,9 @@ def SOI220nm_1310nm_TE_RIB_2x1_MMI(tech: pf.Technology) -> pf.Component:
     ports = list(mmi.ports.items())
     mmi.add_model(
         pf.Tidy3DModel(port_symmetries=[(ports[0], ports[1]), (ports[0], ports[2])]), "Tidy3D"
+    )
+    mmi.add_model(
+        _load_data_model("SOI220nm_1310nm_TE_RIB_2x1_MMI", list(mmi.ports.keys())), "Data"
     )
     return mmi
 
@@ -37,6 +40,9 @@ def SOI220nm_1310nm_TE_RIB_2x2_MMI(tech: pf.Technology) -> pf.Component:
         ),
         "Tidy3D",
     )
+    mmi.add_model(
+        _load_data_model("SOI220nm_1310nm_TE_RIB_2x2_MMI", list(mmi.ports.keys())), "Data"
+    )
     return mmi
 
 
@@ -49,6 +55,9 @@ def SOI220nm_1310nm_TE_RIB_90_Degree_Bend(tech: pf.Technology) -> pf.Component:
     bend = _import_component_with_ports("SOI220nm_1310nm_TE_RIB_90_Degree_Bend", tech)
     ports = list(bend.ports.items())
     bend.add_model(pf.Tidy3DModel(port_symmetries=[(ports[0], ports[1])]), "Tidy3D")
+    bend.add_model(
+        _load_data_model("SOI220nm_1310nm_TE_RIB_90_Degree_Bend", list(bend.ports.keys())), "Data"
+    )
     return bend
 
 
@@ -89,6 +98,10 @@ def SOI220nm_1310nm_TE_RIB_Waveguide_Crossing(tech: pf.Technology) -> pf.Compone
     crossing.add_model(
         pf.Tidy3DModel(port_symmetries=[(ports[0], ports[2]), (ports[1], ports[3])]), "Tidy3D"
     )
+    crossing.add_model(
+        _load_data_model("SOI220nm_1310nm_TE_RIB_Waveguide_Crossing", list(crossing.ports.keys())),
+        "Data",
+    )
     return crossing
 
 
@@ -102,6 +115,9 @@ def SOI220nm_1310nm_TE_STRIP_2x1_MMI(tech: pf.Technology) -> pf.Component:
     ports = list(mmi.ports.items())
     mmi.add_model(
         pf.Tidy3DModel(port_symmetries=[(ports[0], ports[1]), (ports[0], ports[2])]), "Tidy3D"
+    )
+    mmi.add_model(
+        _load_data_model("SOI220nm_1310nm_TE_STRIP_2x1_MMI", list(mmi.ports.keys())), "Data"
     )
     return mmi
 
@@ -125,6 +141,9 @@ def SOI220nm_1310nm_TE_STRIP_2x2_MMI(tech: pf.Technology) -> pf.Component:
         ),
         "Tidy3D",
     )
+    mmi.add_model(
+        _load_data_model("SOI220nm_1310nm_TE_STRIP_2x2_MMI", list(mmi.ports.keys())), "Data"
+    )
     return mmi
 
 
@@ -137,6 +156,10 @@ def SOI220nm_1310nm_TE_STRIP_90_Degree_Bend(tech: pf.Technology) -> pf.Component
     bend = _import_component_with_ports("SOI220nm_1310nm_TE_STRIP_90_Degree_Bend", tech)
     ports = list(bend.ports.items())
     bend.add_model(pf.Tidy3DModel(port_symmetries=[(ports[0], ports[1])]), "Tidy3D")
+    bend.add_model(
+        _load_data_model("SOI220nm_1310nm_TE_STRIP_90_Degree_Bend", list(bend.ports.keys())),
+        "Data",
+    )
     return bend
 
 
@@ -176,6 +199,12 @@ def SOI220nm_1310nm_TE_STRIP_Waveguide_Crossing(tech: pf.Technology) -> pf.Compo
     ports = list(crossing.ports.items())
     crossing.add_model(
         pf.Tidy3DModel(port_symmetries=[(ports[0], ports[2]), (ports[1], ports[3])]), "Tidy3D"
+    )
+    crossing.add_model(
+        _load_data_model(
+            "SOI220nm_1310nm_TE_STRIP_Waveguide_Crossing", list(crossing.ports.keys())
+        ),
+        "Data",
     )
     return crossing
 

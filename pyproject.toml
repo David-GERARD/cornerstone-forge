@@ -72,5 +72,8 @@ extend-ignore = [
     "UP038",   # Unions instead of tuples in isinstance/issubclass
 ]
 
+[tool.ruff]
+exclude = ["*.ipynb"]
+
 [tool.ruff.lint.pydocstyle]
 convention = "google"

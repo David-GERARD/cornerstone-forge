@@ -43,6 +43,7 @@ build-backend = "uv_build"
 [tool.ruff]
 target-version = "py310"
 line-length = 100
+exclude = ["*.ipynb"]
 
 [tool.ruff.lint]
 extend-select = [
@@ -71,9 +72,6 @@ extend-ignore = [
     "PLC0206", # Extracting value from dictionary without calling `.items()`
     "UP038",   # Unions instead of tuples in isinstance/issubclass
 ]
-
-[tool.ruff]
-exclude = ["*.ipynb"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

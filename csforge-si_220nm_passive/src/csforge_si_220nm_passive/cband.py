@@ -180,7 +180,14 @@ def SOI220nm_1550nm_TE_STRIP_Grating_Coupler(tech: pf.Technology) -> pf.Componen
 
     """
     # TODO: Add port symmetries once fiber ports are added to the component definition
-    return _import_component_with_ports("SOI220nm_1550nm_TE_STRIP_Grating_Coupler", tech)
+    grating_coupler = _import_component_with_ports("SOI220nm_1550nm_TE_STRIP_Grating_Coupler", tech)
+    grating_coupler.add_model(
+        _load_data_model(
+            "SOI220nm_1550nm_TE_STRIP_Grating_Coupler", list(grating_coupler.ports.keys())
+        ),
+        "Data",
+    )
+    return grating_coupler
 
 
 components["SOI220nm_1550nm_TE_STRIP_Grating_Coupler"] = SOI220nm_1550nm_TE_STRIP_Grating_Coupler

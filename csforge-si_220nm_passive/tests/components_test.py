@@ -9,11 +9,6 @@ import pytest
 # ---------------------------------------------------------------------------
 
 
-def _port_names(component: pf.Component) -> list[str]:
-    """Return sorted port names for *component*."""
-    return sorted(component.ports.keys())
-
-
 @pytest.fixture(scope="module")
 def tech() -> pf.Technology:
     """Build the PDK technology once for the entire module and set it as default."""
@@ -196,17 +191,26 @@ def test_waveguide_has_two_ports(tech, name: str):
 
 @pytest.mark.parametrize("name", [n for n in pdk.component_names if "Grating_Coupler" in n])
 def test_grating_coupler_has_one_port(tech, name: str):
-    """Test that every grating coupler has exactly one port."""
+    """Test that every grating coupler has one waveguide port and one fiber port."""
     c = pdk.component(name, technology=tech)
-    assert len(c.ports) == 1, f"{name}: expected 1 port, got {len(c.ports)}"
+    waveguide_ports = [p for p in c.ports if not p.startswith("FP")]
+    fiber_ports = [p for p in c.ports if p.startswith("FP")]
+    assert len(waveguide_ports) == 1, (
+        f"{name}: expected 1 waveguide port, got {len(waveguide_ports)}"
+    )
+    assert len(fiber_ports) == 1, f"{name}: expected 1 fiber port, got {len(fiber_ports)}"
 
 
 @pytest.mark.parametrize("name", [n for n in pdk.component_names if "_MZI" in n])
 def test_mzi_has_two_electrical_ports(tech, name: str):
-    """Test that every MZI exposes exactly two electrical ports named e1 and e2."""
+    """Test that every MZI exposes exactly two electrical ports named e1 and e2.
+
+    Fiber ports (``FP*``, added for the vertical grating couplers used to
+    probe the MZI arms) are excluded, since their count is device-specific.
+    """
     c = pdk.component(name, technology=tech)
-    assert len(c.ports) == 2, f"{name}: expected 2 ports, got {len(c.ports)}"
-    assert _port_names(c) == ["P1", "P2"]
+    non_fiber_ports = sorted(p for p in c.ports if not p.startswith("FP"))
+    assert non_fiber_ports == ["P1", "P2"], f"{name}: expected ports P1, P2, got {non_fiber_ports}"
 
 
 # ---------------------------------------------------------------------------

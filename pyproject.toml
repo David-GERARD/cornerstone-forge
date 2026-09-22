@@ -8,7 +8,10 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
+    "ipykernel>=7.3.0",
+    "ipywidgets>=8.1.9",
     "photonforge>=1.3.2",
+    "csforge-si_220nm_passive",
 ]
 [dependency-groups]
 dev = [

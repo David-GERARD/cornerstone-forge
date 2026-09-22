@@ -59,33 +59,56 @@ port_specs = _ports(_thicknesses)
 
 
 def test_strip_1310nm_port_spec():
-    """Test that the strip_1310nm port spec has the expected parameters."""
+    """Test that the strip_1310nm port spec has the expected parameters.
+
+    Note: spec.width is the port simulation area width, not the waveguide
+    width, which instead comes from the first path_profiles entry.
+    """
     spec = port_specs["strip_1310nm"]
-    assert spec.width == pytest.approx(0.4)
+    assert spec.width == pytest.approx(0.6804)
+    assert spec.path_profiles[0][0] == pytest.approx(0.4)  # wg_lf (strip core) width
     assert spec.num_modes == 2
     assert spec.target_neff == pytest.approx(2.52)
 
 
 def test_rib_1310nm_port_spec():
-    """Test that the rib_1310nm_TE port spec has the expected parameters."""
+    """Test that the rib_1310nm_TE port spec has the expected parameters.
+
+    Note: spec.width is the port simulation area width, not the waveguide
+    width, which instead comes from the first path_profiles entry.
+    """
     spec = port_specs["rib_1310nm_TE"]
-    assert spec.width == pytest.approx(0.4)
+    assert spec.width == pytest.approx(2.8556)
+    assert spec.path_profiles[0][0] == pytest.approx(0.4)  # wg_lf (rib core) width
+    assert spec.path_profiles[1][0] == pytest.approx(10.4)  # rib_slab width
     assert spec.num_modes == 1
     assert spec.target_neff == pytest.approx(2.52)
     assert spec.polarization == "TE"
 
 
 def test_strip_1550nm_port_spec():
-    """Test that the strip_1550nm port spec has the expected parameters."""
+    """Test that the strip_1550nm port spec has the expected parameters.
+
+    Note: spec.width is the port simulation area width, not the waveguide
+    width, which instead comes from the first path_profiles entry.
+    """
     spec = port_specs["strip_1550nm"]
-    assert spec.width == pytest.approx(0.45)
+    assert spec.width == pytest.approx(0.7937)
+    assert spec.path_profiles[0][0] == pytest.approx(0.45)  # wg_lf (strip core) width
     assert spec.num_modes == 2
     assert spec.target_neff == pytest.approx(2.38)
 
 
 def test_rib_1550nm_port_spec():
-    """Test that the rib_1550nm_TE port spec has the expected parameters."""
+    """Test that the rib_1550nm_TE port spec has the expected parameters.
+
+    Note: spec.width is the port simulation area width, not the waveguide
+    width, which instead comes from the first path_profiles entry.
+    """
     spec = port_specs["rib_1550nm_TE"]
+    assert spec.width == pytest.approx(1.2999)
+    assert spec.path_profiles[0][0] == pytest.approx(0.45)  # wg_lf (rib core) width
+    assert spec.path_profiles[1][0] == pytest.approx(10.45)  # rib_slab width
     assert spec.num_modes == 1
     assert spec.target_neff == pytest.approx(2.38)
     assert spec.polarization == "TE"

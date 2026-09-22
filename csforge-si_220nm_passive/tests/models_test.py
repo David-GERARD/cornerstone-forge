@@ -24,9 +24,9 @@ _3PORT_NAMES = ["P1", "P2", "P3"]
 _4PORT_NAMES = ["P1", "P2", "P3", "P4"]
 
 # Components that have a matching S-parameter CSV and whose port count
-# matches the CSV port count (grating couplers are excluded because the
-# vertical_te port is filtered out of the component, leaving only 1 optical
-# port while the CSV contains a 2-port model).
+# matches the CSV port count (grating couplers are excluded because their
+# vertical_te port is attached as a fiber port named "FP...", not "P...",
+# so it isn't one of the CSV's positional P1/P2 port names).
 _COMPONENTS_WITH_DATA_MODEL = [
     # O-band RIB
     ("SOI220nm_1310nm_TE_RIB_2x1_MMI", _3PORT_NAMES),

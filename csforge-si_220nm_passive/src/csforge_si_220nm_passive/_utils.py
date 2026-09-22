@@ -6,6 +6,7 @@ import re as _re
 import warnings
 
 import photonforge as pf
+import tidy3d as td
 import yaml
 
 _GDS_DIR = pathlib.Path(__file__).parent / "gds"
@@ -19,7 +20,9 @@ def _import_component_with_ports(component_name: str, tech: pf.Technology) -> pf
 
     Looks for ``<component_name>.gds`` and ``<component_name>.yaml`` in the
     ``gds/`` directory alongside this module.  Ports with ``port_type:
-    vertical_te`` are ignored.  The port ``input_direction`` is derived from
+    vertical_te`` are attached as :class:`pf.FiberPort` instances, named
+    ``FP<name>``; all other ports are attached as :class:`pf.Port` instances,
+    named ``P<name[1:]>``.  The port ``input_direction`` is derived from
     the YAML ``orientation`` field as ``(orientation + 180) % 360``, i.e. the
     direction power travels *into* the component, opposite to the outward port
     normal.
@@ -31,7 +34,7 @@ def _import_component_with_ports(component_name: str, tech: pf.Technology) -> pf
         tech: The technology to use for loading the GDS and interpreting the port specs.
 
     Returns:
-        The loaded component with optical and electrical ports attached.
+        The loaded component with optical, electrical, and fiber ports attached.
 
     Raises:
         FileNotFoundError: If the ``.gds`` file does not exist.
@@ -59,18 +62,28 @@ def _import_component_with_ports(component_name: str, tech: pf.Technology) -> pf
         spec = yaml.safe_load(f)
 
     for port_def in spec.get("ports", []):
-        if port_def.get("port_type") == "vertical_te":
-            continue
-
         # input_direction is the direction power travels into the component,
         # which is opposite to the outward orientation of the port face.
         input_direction = (port_def["orientation"] + 180) % 360
-        port = pf.Port(
-            center=port_def["center"],
-            input_direction=input_direction,
-            spec=tech.ports[port_def["cross_section"]],
-        )
-        component.add_port(port, f"P{port_def['name'][1:]}")
+        if port_def.get("port_type") == "vertical_te":
+            core = pf.Circle(port_def["width"] / 2)
+            port = pf.FiberPort(
+                center=(port_def["center"][0], port_def["center"][1], 0),
+                input_vector=(1, 0, 0),
+                size=(port_def["width"], port_def["width"]),
+                extrusion_limits=(-50, 0.1),
+                cross_section=[(core, td.Medium(permittivity=1.46**2))],
+                num_modes=2,
+                target_neff=2,
+            )
+            component.add_port(port, f"FP{port_def['name']}")
+        else:
+            port = pf.Port(
+                center=port_def["center"],
+                input_direction=input_direction,
+                spec=tech.ports[port_def["cross_section"]],
+            )
+            component.add_port(port, f"P{port_def['name'][1:]}")
 
     return component
 

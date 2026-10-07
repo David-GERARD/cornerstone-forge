@@ -8,7 +8,7 @@ Follow these steps to set up a local development environment for Cornerstone For
 
 | Tool | Minimum version | Install |
 |------|----------------|---------|
-| Python | 3.12 | [python.org](https://www.python.org/downloads/) |
+| Python | 3.10 | [python.org](https://www.python.org/downloads/) |
 | uv | latest | [docs.astral.sh/uv](https://docs.astral.sh/uv/getting-started/installation/) |
 | Git | any | [git-scm.com](https://git-scm.com/) |
 

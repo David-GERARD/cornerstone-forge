@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "David-GERARD", email = "david.gerard.23@ucl.ac.uk" }
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
     "ipykernel>=7.3.0",
     "ipywidgets>=8.1.9",
@@ -18,6 +18,7 @@ dev = [
     "pre-commit>=4.6.0",
     "pytest>=9.0.3",
     "ruff>=0.15.12",
+    "tomli>=2.0.1; python_version < '3.11'",
 ]
 docs = [
     "mkdocs>=1.6.1",

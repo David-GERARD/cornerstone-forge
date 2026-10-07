@@ -3,7 +3,11 @@
 import pathlib
 
 import csforge_si_220nm_passive as pdk
-import tomllib
+
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 # ---------------------------------------------------------------------------
 # Version

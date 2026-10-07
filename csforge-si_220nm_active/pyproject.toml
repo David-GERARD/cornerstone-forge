@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "David-GERARD", email = "david.gerard.23@ucl.ac.uk" }
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [] # Dependencies are managed at the workspace level
 
 [build-system]

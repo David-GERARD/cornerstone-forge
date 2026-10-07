@@ -43,7 +43,7 @@ print(list(mmi.ports.keys()))  # ['o1', 'o2', 'o3']
 
 ### Prerequisites
 
-- Python ≥ 3.12
+- Python ≥ 3.10
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
 - Git
 

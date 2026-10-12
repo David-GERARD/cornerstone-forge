@@ -1,7 +1,7 @@
 """This module defines the media used in the Si 220nm passive PDK.
 
 Media:
-    - Optical dispersive media for Si and SiO2 are loaded from PDK data.
+    - Optical dispersive media for Si and SiO2 use stored fits of the PDK data.
     - Electrical media for Si and SiO2 are defined with typical permittivity values.
     - TiN media is defined for heaters, with properties taken from literature.
     - Aluminum media is defined for contact pads, using Tidy3D's material library.
@@ -10,14 +10,13 @@ Media:
 
 import tidy3d as td
 
-from .data.materials import _load_material_data
+from ._material_fits import medium_si, medium_sio2
 
 ###############
 # MEDIA
 ###############
 
 # Waveguide and substrate media
-medium_si, medium_sio2 = _load_material_data()
 _media = {
     "sio2": {
         "optical": medium_sio2,

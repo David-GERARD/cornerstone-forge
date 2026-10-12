@@ -3,72 +3,40 @@ name: Tests
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  detect:
+  pytest:
+    name: pytest (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
-    outputs:
-      packages: ${{ steps.changed.outputs.packages }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Detect changed packages
-        id: changed
-        shell: bash
-        run: |
-          # Read workspace members from pyproject.toml (tomllib is stdlib since Python 3.11)
-          ALL=$(python3 -c 'import tomllib,json; m=tomllib.load(open("pyproject.toml","rb"))["tool"]["uv"]["workspace"]["members"]; print(json.dumps(m))')
-          MEMBERS=$(python3 -c 'import tomllib; m=tomllib.load(open("pyproject.toml","rb"))["tool"]["uv"]["workspace"]["members"]; print(" ".join(m))')
-          # ERE pattern matching any package subdirectory, e.g. ^(pkg-a|pkg-b)/
-          PKG_PATTERN="^($(echo "$MEMBERS" | tr ' ' '|'))/"
-
-          # Manual trigger or first push to branch: run every package
-          BEFORE="${{ github.event.before }}"
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] \
-            || [[ "$BEFORE" == "0000000000000000000000000000000000000000" ]] \
-            || ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
-            echo "packages=$ALL" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          CHANGED=$(git diff --name-only "$BEFORE" "${{ github.sha }}")
-
-          # A root-level change (pyproject.toml, uv.lock, …) may affect all packages
-          if echo "$CHANGED" | grep -qvE "$PKG_PATTERN"; then
-            echo "packages=$ALL" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          # Collect only packages whose subdirectory was touched
-          PKGS=()
-          for pkg in $MEMBERS; do
-            echo "$CHANGED" | grep -q "^${pkg}/" && PKGS+=("\"$pkg\"")
-          done
-
-          if [[ ${#PKGS[@]} -eq 0 ]]; then
-            echo "packages=[]" >> "$GITHUB_OUTPUT"
-          else
-            (IFS=,; echo "packages=[${PKGS[*]}]") >> "$GITHUB_OUTPUT"
-          fi
-
-  test:
-    needs: detect
-    if: needs.detect.outputs.packages != '[]'
     strategy:
       fail-fast: false
       matrix:
-        package: ${{ fromJson(needs.detect.outputs.packages) }}
-    runs-on: ubuntu-latest
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
 
-      - uses: astral-sh/setup-uv@v6
+      - name: Install uv and Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: uv sync --group dev
+        run: uv sync --locked --group dev
 
       - name: Run tests
-        run: uv run pytest ${{ matrix.package }} -v
+        shell: bash
+        run: |
+          # Run pytest per package so each package's own pytest config applies
+          for tests_dir in */tests; do
+            pkg="${tests_dir%/tests}"
+            echo "::group::pytest $pkg"
+            uv run pytest "$pkg"
+            echo "::endgroup::"
+          done

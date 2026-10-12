@@ -5,7 +5,11 @@ import pathlib
 import csforge_si_220nm_passive as pdk
 import photonforge as pf
 import pytest
-import tomllib
+
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 from csforge_si_220nm_passive._layers import _connections, _layer_specs, _thicknesses
 from csforge_si_220nm_passive._ports import _ports
 from csforge_si_220nm_passive.technology import csforge_si_220nm_pdk

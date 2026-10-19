@@ -98,7 +98,8 @@ Each PDK is a subpackage of `cornerstone_forge`; no packaging changes are needed
 2. Add its tests under `tests/<technology>/`. Test module names may repeat those of other PDKs
    (e.g. `technology_test.py`) because pytest runs in `importlib` import mode.
 
-3. Put example notebooks under `notebooks/<technology>/`, and any development-only scripts or
-   source data (not shipped in the wheel) under `tools/<technology>/`.
+3. Put example notebooks (Quarto `.qmd` files, see [Notebooks](notebooks.md)) under
+   `notebooks/<technology>/`, and any development-only scripts or source data (not shipped in
+   the wheel) under `tools/<technology>/`.
 
 4. Add a documentation page at `docs/pdks/<technology>.md` and register it in `mkdocs.yml`.

@@ -24,7 +24,7 @@ Key commands:
 | `uv sync` | Install all main dependencies |
 | `uv sync --group dev` | Include development tools |
 | `uv sync --group docs` | Include documentation tools |
-| `uv sync --group notebooks` | Include the Jupyter kernel for the notebooks |
+| `uv sync --group notebooks` | Include the Jupyter kernel and Quarto execution dependencies for the notebooks |
 | `uv sync --group dev --group docs` | Full contributor setup |
 | `uv run <cmd>` | Run a command inside the project environment |
 | `uv add --group dev <pkg>` | Add a dev dependency |
@@ -89,6 +89,25 @@ Test files follow the `*_test.py` naming convention and are organised by topic:
 | `technology_test.py` | Technology definition, layers, thicknesses, port specs, extrusions |
 | `components_test.py` | Component catalogue, port counts, port names, naming conventions |
 | `package_test.py` | `cornerstone_forge.__version__` matches `pyproject.toml` |
+
+---
+
+## Quarto
+
+[Quarto](https://quarto.org/) is used for the notebooks in `notebooks/<technology>/`, written as
+`.qmd` files. The Quarto CLI is installed separately from the
+[Quarto website](https://quarto.org/docs/get-started/); the Python side (Jupyter kernel) comes from
+the `notebooks` dependency group. In VS Code, use the
+[Quarto extension](https://marketplace.visualstudio.com/items?itemName=quarto.quarto) with the
+`.venv/` interpreter selected.
+
+```bash
+uv run --group notebooks quarto check jupyter                 # verify Quarto uses .venv/
+uv run --group notebooks quarto preview <path/to/file>.qmd    # live preview
+uv run --group notebooks quarto render <path/to/file>.qmd     # render to HTML
+```
+
+See [Notebooks](notebooks.md) for the full setup and workflow.
 
 ---
 

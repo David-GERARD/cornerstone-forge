@@ -39,10 +39,16 @@ This creates a `.venv/` at the repository root and installs:
 - `cornerstone-forge` itself in editable mode (all PDK subpackages)
 - Development tools (pytest, ruff, pre-commit)
 
-To also install documentation tools, or the Jupyter kernel used by the notebooks:
+To also install documentation tools:
 
 ```bash
 uv sync --group dev --group docs
+```
+
+To edit and run the notebooks, install the [Quarto CLI](https://quarto.org/docs/get-started/) and
+the notebook dependencies (see [Notebooks](notebooks.md) for the full setup, including VS Code):
+
+```bash
 uv sync --group dev --group notebooks
 ```
 

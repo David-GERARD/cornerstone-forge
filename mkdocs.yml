@@ -55,6 +55,7 @@ nav:
     - Tools: developers/tools.md
     - Installation: developers/installation.md
     - Build & Workflow: developers/build.md
+    - Notebooks: developers/notebooks.md
   - Users:
     - Installation: users/installation.md
     - Usage: users/usage.md

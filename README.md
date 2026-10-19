@@ -46,6 +46,7 @@ print(list(mmi.ports.keys()))  # ['o1', 'o2', 'o3']
 - Python ≥ 3.10
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
 - Git
+- [Quarto CLI](https://quarto.org/docs/get-started/) (only needed to edit and run the notebooks)
 
 ### Steps
 
@@ -76,6 +77,28 @@ uv run pytest
 | Format | `uv run ruff format .` |
 | Preview docs | `uv run --group docs mkdocs serve` |
 | Build docs | `uv run --group docs mkdocs build` |
+| Preview a notebook | `uv run --group notebooks quarto preview notebooks/si_220nm_passive/example-design.qmd` |
+
+### Notebooks (Quarto)
+
+The notebooks in `notebooks/<technology>/` are [Quarto](https://quarto.org/) documents (`.qmd`).
+
+1. Download and install the Quarto CLI from the [Quarto website](https://quarto.org/docs/get-started/).
+2. Install the notebook dependencies (Jupyter kernel) into the project's `.venv/`:
+
+    ```bash
+    uv sync --group dev --group notebooks
+    uv run --group notebooks quarto check jupyter   # Python path must point to .venv/
+    ```
+
+3. In VS Code, install the [Quarto extension](https://marketplace.visualstudio.com/items?itemName=quarto.quarto)
+   (plus the Python and Jupyter extensions to run cells), then run **>Python: Select Interpreter** in the VSCode command space (top of the window).
+   and choose `./.venv/bin/python`. **Run Cell** and **Quarto: Preview** then use the project environment.
+4. From the terminal, always run Quarto through uv so it uses `.venv/`:
+   `uv run --group notebooks quarto preview <file>.qmd` or `uv run --group notebooks quarto render <file>.qmd`.
+
+> **Note** — Notebooks set `run_fdtd = False` by default, so rendering them never submits
+> Tidy3D cloud simulations (which consume FlexCredits). Set it to `True` to run them.
 
 ---
 
@@ -92,7 +115,7 @@ cornerstone-forge/
 │   └── si_220nm_active/            # Active PDK (in development)
 ├── tests/
 │   └── si_220nm_passive/
-├── notebooks/
+├── notebooks/                      # Quarto (.qmd) notebooks
 │   └── si_220nm_passive/
 └── tools/
     └── si_220nm_passive/           # Dev-only scripts and source data (not shipped)

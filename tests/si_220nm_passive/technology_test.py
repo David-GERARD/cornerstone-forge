@@ -1,18 +1,12 @@
-"""Tests for the csforge_si_220nm_passive technology definition."""
+"""Tests for the cornerstone_forge.si_220nm_passive technology definition."""
 
-import pathlib
-
-import csforge_si_220nm_passive as pdk
 import photonforge as pf
 import pytest
 
-try:
-    import tomllib
-except ModuleNotFoundError:
-    import tomli as tomllib
-from csforge_si_220nm_passive._layers import _connections, _layer_specs, _thicknesses
-from csforge_si_220nm_passive._ports import _ports
-from csforge_si_220nm_passive.technology import csforge_si_220nm_pdk
+from cornerstone_forge import si_220nm_passive as pdk
+from cornerstone_forge.si_220nm_passive._layers import _connections, _layer_specs, _thicknesses
+from cornerstone_forge.si_220nm_passive._ports import _ports
+from cornerstone_forge.si_220nm_passive.technology import csforge_si_220nm_pdk
 
 # ---------------------------------------------------------------------------
 # Load technology test
@@ -188,18 +182,10 @@ def test_technology_name():
     assert tech.name == "csforge_si_220nm_passive"
 
 
-def _pyproject_version() -> str:
-    """Read the package version from csforge-si_220nm_passive/pyproject.toml."""
-    pyproject_path = pathlib.Path(__file__).parents[1] / "pyproject.toml"
-    with open(pyproject_path, "rb") as f:
-        data = tomllib.load(f)
-    return data["project"]["version"]
-
-
 def test_technology_version():
-    """Test that the technology version string is set to the package version."""
+    """Test that the technology version string is set to the subpackage version."""
     tech = csforge_si_220nm_pdk()
-    assert tech.version == _pyproject_version()
+    assert tech.version == pdk.__version__
 
 
 def test_technology_has_layers():

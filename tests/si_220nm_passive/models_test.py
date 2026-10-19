@@ -9,11 +9,12 @@ These tests verify that:
   structural symmetry (S_31 = S_42, S_41 = S_32).
 """
 
-import csforge_si_220nm_passive as pdk
 import numpy as np
 import photonforge as pf
 import pytest
-from csforge_si_220nm_passive._utils import _load_data_model
+
+from cornerstone_forge import si_220nm_passive as pdk
+from cornerstone_forge.si_220nm_passive._utils import _load_data_model
 
 # ---------------------------------------------------------------------------
 # Fixtures

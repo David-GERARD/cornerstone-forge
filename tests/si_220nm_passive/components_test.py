@@ -1,8 +1,9 @@
-"""Tests for the csforge_si_220nm_passive component catalogue and component() entry point."""
+"""Tests for the si_220nm_passive component catalogue and component() entry point."""
 
-import csforge_si_220nm_passive as pdk
 import photonforge as pf
 import pytest
+
+from cornerstone_forge import si_220nm_passive as pdk
 
 # ---------------------------------------------------------------------------
 # Helpers

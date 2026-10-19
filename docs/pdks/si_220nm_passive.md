@@ -1,6 +1,6 @@
-# csforge-si_220nm_passive
+# si_220nm_passive
 
-[PhotonForge](https://docs.flexcompute.com/projects/photonforge/en/latest/) PDK for **Cornerstone's SOI 220 nm passive process**.
+[PhotonForge](https://docs.flexcompute.com/projects/photonforge/en/latest/) PDK for **Cornerstone's SOI 220 nm passive process**, provided by the `cornerstone_forge.si_220nm_passive` subpackage.
 
 Provides a parametric `pf.Technology` definition and a complete component catalogue covering O-band (1310 nm), C-band (1550 nm), and band-agnostic components, backed by Cornerstone GDS cells and YAML port specs.
 Process data sourced from [cornerstone-uos/cornerstone-pdk](https://github.com/cornerstone-uos/cornerstone-pdk/tree/main/Si_220nm_passive).
@@ -13,7 +13,7 @@ The design goal is that **the technology is defined once by the user** and passe
 
 ```python
 import photonforge as pf
-import csforge_si_220nm_passive as pdk
+from cornerstone_forge import si_220nm_passive as pdk
 
 # Build the technology once
 tech = pdk.csforge_si_220nm_pdk()
@@ -83,7 +83,7 @@ The SOI 220 nm passive process uses a standard Silicon-on-Insulator stack. Nomin
 ### `csforge_si_220nm_pdk`
 
 ```python
-from csforge_si_220nm_passive import csforge_si_220nm_pdk
+from cornerstone_forge.si_220nm_passive import csforge_si_220nm_pdk
 
 tech = csforge_si_220nm_pdk()                          # process-nominal defaults
 tech = csforge_si_220nm_pdk(waveguide_thickness=0.25)  # override a thickness
@@ -187,7 +187,7 @@ wg = pdk.component("SOI220nm_1550nm_TE_STRIP_Waveguide")
 ### Other names
 
 ```python
-import csforge_si_220nm_passive as pdk
+from cornerstone_forge import si_220nm_passive as pdk
 
 pdk.csforge_si_220nm_pdk       # parametric technology factory
 pdk.components                 # dict[str, Callable] — all component factories

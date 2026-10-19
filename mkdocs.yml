@@ -59,4 +59,4 @@ nav:
     - Installation: users/installation.md
     - Usage: users/usage.md
   - PDKs:
-    - SI 220nm Passive: pdks/csforge-si_220nm_passive.md
+    - SI 220nm Passive: pdks/si_220nm_passive.md

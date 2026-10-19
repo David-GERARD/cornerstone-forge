@@ -1,9 +1,8 @@
 """Generate static pole-residue models from the foundry material data.
 
-Run this module from the project directory to regenerate and format the
-installed source module::
+Run this module to regenerate and format the installed source module::
 
-    python medium_converter.py
+    python tools/si_220nm_passive/medium_converter.py
 """
 
 import subprocess
@@ -14,7 +13,13 @@ import tidy3d as td
 from tidy3d.plugins.dispersion import AdvancedFastFitterParam, FastDispersionFitter
 
 MATERIAL_DATA_DIR = Path(__file__).parent / "material_data"
-OUTPUT_FILE = Path(__file__).parent / "src" / "csforge_si_220nm_passive" / "_material_fits.py"
+OUTPUT_FILE = (
+    Path(__file__).parents[2]
+    / "src"
+    / "cornerstone_forge"
+    / "si_220nm_passive"
+    / "_material_fits.py"
+)
 MAX_RMS_ERROR = 1e-5
 
 

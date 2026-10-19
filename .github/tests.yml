@@ -45,4 +45,4 @@ jobs:
       - name: Import the built wheel in a clean environment
         run: >-
           uv run --isolated --no-project --with dist/*.whl
-          python -c "from cornerstone_forge import si_220nm_passive as cs; cs.csforge_si_220nm_pdk()"
+          python -c "from cornerstone_forge import si_220nm_passive as cs; cs.si_220nm_passive_pdk()"

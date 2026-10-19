@@ -11,7 +11,7 @@ from .component import (
     oband_component_names,  # List of component names specific to the O-band (1310 nm).
     oband_components,  # Dictionary of O-band component factory functions.
 )
-from .technology import csforge_si_220nm_pdk, technology_version
+from .technology import si_220nm_passive_pdk, technology_version
 
 __version__ = technology_version
 __all__ = [
@@ -22,9 +22,9 @@ __all__ = [
     "component",
     "component_names",
     "components",
-    "csforge_si_220nm_pdk",
     "oband_component_names",
     "oband_components",
+    "si_220nm_passive_pdk",
 ]
 
 
@@ -33,7 +33,7 @@ def plot_cross_section(technology=None):
     import photonforge as pf  # noqa: PLC0415
 
     if technology is None:
-        technology = csforge_si_220nm_pdk()
+        technology = si_220nm_passive_pdk()
 
     c = pf.Component("test_component", technology=technology)
 

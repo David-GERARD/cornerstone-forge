@@ -16,7 +16,7 @@ import photonforge as pf
 from cornerstone_forge import si_220nm_passive as pdk
 
 # Build the technology once
-tech = pdk.csforge_si_220nm_pdk()
+tech = pdk.si_220nm_passive_pdk()
 
 # Instantiate components by name, passing the technology explicitly
 wg  = pdk.component("SOI220nm_1550nm_TE_STRIP_Waveguide", technology=tech)
@@ -80,14 +80,14 @@ The SOI 220 nm passive process uses a standard Silicon-on-Insulator stack. Nomin
 
 ## Technology API
 
-### `csforge_si_220nm_pdk`
+### `si_220nm_passive_pdk`
 
 ```python
-from cornerstone_forge.si_220nm_passive import csforge_si_220nm_pdk
+from cornerstone_forge.si_220nm_passive import si_220nm_passive_pdk
 
-tech = csforge_si_220nm_pdk()                          # process-nominal defaults
-tech = csforge_si_220nm_pdk(waveguide_thickness=0.25)  # override a thickness
-tech = csforge_si_220nm_pdk(include_substrate=True)    # add Si substrate
+tech = si_220nm_passive_pdk()                          # process-nominal defaults
+tech = si_220nm_passive_pdk(waveguide_thickness=0.25)  # override a thickness
+tech = si_220nm_passive_pdk(include_substrate=True)    # add Si substrate
 ```
 
 All parameters have process-nominal defaults and can be overridden individually:
@@ -174,7 +174,7 @@ if `technology` is `None`. Issues a `RuntimeWarning` when the default technology
 name does not match the PDK.
 
 ```python
-tech = pdk.csforge_si_220nm_pdk()
+tech = pdk.si_220nm_passive_pdk()
 
 # Explicit technology (recommended)
 wg = pdk.component("SOI220nm_1550nm_TE_STRIP_Waveguide", technology=tech)
@@ -189,7 +189,7 @@ wg = pdk.component("SOI220nm_1550nm_TE_STRIP_Waveguide")
 ```python
 from cornerstone_forge import si_220nm_passive as pdk
 
-pdk.csforge_si_220nm_pdk       # parametric technology factory
+pdk.si_220nm_passive_pdk       # parametric technology factory
 pdk.components                 # dict[str, Callable] — all component factories
 pdk.component_names            # list[str] — all names (oband + cband + allband)
 pdk.oband_components           # dict[str, Callable] — O-band factories

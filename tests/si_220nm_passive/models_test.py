@@ -57,7 +57,7 @@ _2X2_MMI_NAMES = [name for name, _ in _COMPONENTS_WITH_DATA_MODEL if "2x2_MMI" i
 @pytest.fixture(scope="module")
 def tech() -> pf.Technology:
     """Build the PDK technology once per module and set it as default."""
-    t = pdk.csforge_si_220nm_pdk()
+    t = pdk.si_220nm_passive_pdk()
     pf.config.default_technology = t
     return t
 

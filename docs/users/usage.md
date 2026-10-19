@@ -14,7 +14,7 @@ import photonforge as pf
 from cornerstone_forge import si_220nm_passive as pdk
 
 # Register the technology
-tech = pdk.csforge_si_220nm_pdk()
+tech = pdk.si_220nm_passive_pdk()
 pf.config.default_technology = tech
 
 # Use a component from the catalogue

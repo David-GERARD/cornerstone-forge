@@ -32,10 +32,10 @@ def component(cell_name: str, technology: pf.Technology | None = None, **kwargs)
     """
     if technology is None:
         technology = pf.config.default_technology
-        if "csforge_si_220nm_passive" not in technology.name:
+        if "cornerstone-si_220nm_passive-forge" not in technology.name:
             warnings.warn(
                 f"Current default technology {technology.name} does not seem compatible with the "
-                f"csforge_si_220nm_passive component library",
+                f"cornerstone-si_220nm_passive-forge component library",
                 RuntimeWarning,
                 2,
             )

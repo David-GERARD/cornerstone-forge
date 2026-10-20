@@ -1,3 +1,6 @@
+# NOTE: kept outside .github/workflows/ (i.e. disabled) until a Tidy3D API key
+# is available as the SIMCLOUD_APIKEY repository secret. Move it back into
+# .github/workflows/ to enable it.
 name: Tests
 
 on:
@@ -15,6 +18,9 @@ jobs:
   pytest:
     name: pytest (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    env:
+      # PhotonForge checks its licence against the Tidy3D API.
+      SIMCLOUD_APIKEY: ${{ secrets.SIMCLOUD_APIKEY }}
     strategy:
       fail-fast: false
       matrix:
@@ -31,12 +37,12 @@ jobs:
         run: uv sync --locked --group dev
 
       - name: Run tests
-        shell: bash
-        run: |
-          # Run pytest per package so each package's own pytest config applies
-          for tests_dir in */tests; do
-            pkg="${tests_dir%/tests}"
-            echo "::group::pytest $pkg"
-            uv run pytest "$pkg"
-            echo "::endgroup::"
-          done
+        run: uv run pytest
+
+      - name: Build package
+        run: uv build
+
+      - name: Import the built wheel in a clean environment
+        run: >-
+          uv run --isolated --no-project --with dist/*.whl
+          python -c "from cornerstone_forge import si_220nm_passive as cs; cs.si_220nm_passive_pdk()"

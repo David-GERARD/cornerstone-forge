@@ -191,9 +191,9 @@ components["SOI220nm_1310nm_TE_STRIP_Waveguide_Crossing"] = (
 component_names = list(components.keys())
 
 if __name__ == "__main__":
-    from .technology import csforge_si_220nm_pdk
+    from .technology import si_220nm_passive_pdk
 
-    tech = csforge_si_220nm_pdk()
+    tech = si_220nm_passive_pdk()
     pf.config.default_technology = tech
 
     for name in component_names:

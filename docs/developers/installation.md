@@ -33,16 +33,23 @@ Install all main and development dependencies using uv:
 uv sync --group dev
 ```
 
-This creates a `.venv/` at the workspace root and installs:
+This creates a `.venv/` at the repository root and installs:
 
 - All shared dependencies (`photonforge`, etc.)
-- Both workspace members (`csforge-si_220nm_passive`, `csforge-si_220nm_active`) in editable mode
+- `cornerstone-forge` itself in editable mode (all PDK subpackages)
 - Development tools (pytest, ruff, pre-commit)
 
 To also install documentation tools:
 
 ```bash
 uv sync --group dev --group docs
+```
+
+To edit and run the notebooks, install the [Quarto CLI](https://quarto.org/docs/get-started/) and
+the notebook dependencies (see [Notebooks](notebooks.md) for the full setup, including VS Code):
+
+```bash
+uv sync --group dev --group notebooks
 ```
 
 ---
@@ -89,9 +96,10 @@ Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
 To add a new runtime dependency:
 
 ```bash
-uv add <package>                   # workspace root
+uv add <package>                   # runtime dependency
 uv add --group dev <package>       # dev group
 uv add --group docs <package>      # docs group
+uv add --group notebooks <package> # notebooks group
 ```
 
 Always commit the updated `uv.lock` file alongside any `pyproject.toml` changes.

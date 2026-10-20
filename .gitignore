@@ -1,4 +1,11 @@
 **/__pycache__/
 build/
-**/notebooks/data/*
+notebooks/*/data/
 **/.ipynb_checkpoints
+.DS_Store
+dist/
+
+# Quarto render output
+.quarto/
+notebooks/**/*.html
+notebooks/**/*_files/

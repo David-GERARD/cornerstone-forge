@@ -9,11 +9,12 @@ These tests verify that:
   structural symmetry (S_31 = S_42, S_41 = S_32).
 """
 
-import csforge_si_220nm_passive as pdk
 import numpy as np
 import photonforge as pf
 import pytest
-from csforge_si_220nm_passive._utils import _load_data_model
+
+from cornerstone_forge import si_220nm_passive as pdk
+from cornerstone_forge.si_220nm_passive._utils import _load_data_model
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -56,7 +57,7 @@ _2X2_MMI_NAMES = [name for name, _ in _COMPONENTS_WITH_DATA_MODEL if "2x2_MMI" i
 @pytest.fixture(scope="module")
 def tech() -> pf.Technology:
     """Build the PDK technology once per module and set it as default."""
-    t = pdk.csforge_si_220nm_pdk()
+    t = pdk.si_220nm_passive_pdk()
     pf.config.default_technology = t
     return t
 

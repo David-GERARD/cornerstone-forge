@@ -5,9 +5,10 @@ from pathlib import Path
 import numpy as np
 import pytest
 import tidy3d as td
-from csforge_si_220nm_passive._material_fits import medium_si, medium_sio2
 
-MATERIAL_DATA_DIR = Path(__file__).parents[1] / "material_data"
+from cornerstone_forge.si_220nm_passive._material_fits import medium_si, medium_sio2
+
+MATERIAL_DATA_DIR = Path(__file__).parents[2] / "tools" / "si_220nm_passive" / "material_data"
 WAVELENGTH_RANGE_UM = (1.20036, 1.696618164)
 
 

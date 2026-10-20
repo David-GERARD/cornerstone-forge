@@ -1,27 +1,27 @@
 # Installation
 
 !!! warning "Coming soon"
-    Cornerstone Forge packages have not yet been published to PyPI.
-    This page will be updated once the packages are available.
+    Cornerstone Forge has not yet been published to PyPI.
+    This page will be updated once the package is available.
 
 ---
 
 ## Planned installation
 
-Once published, installation will be as simple as:
+Once published, a single package will provide every PDK:
 
 ```bash
-pip install csforge-si_220nm_passive
+pip install cornerstone-forge
 ```
 
 Or with uv:
 
 ```bash
-uv add csforge-si_220nm_passive
+uv add cornerstone-forge
 ```
 
 ---
 
 ## In the meantime
 
-To use Cornerstone Forge today, install directly from source by following the [Contributor Installation](../developers/installation.md) guide. All packages are installed in editable mode from the workspace, so they work identically to a published release.
+To use Cornerstone Forge today, install directly from source by following the [Contributor Installation](../developers/installation.md) guide. The package is installed in editable mode, so it works identically to a published release.

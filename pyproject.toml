@@ -1,18 +1,18 @@
 [project]
-name = "csforge-workspace"
-version = "0.1.0"
-description = "Add your description here"
+name = "cornerstone-forge"
+version = "0.3.0"
+description = "PhotonForge implementation of Cornerstone's silicon photonics PDKs"
 readme = "README.md"
 authors = [
     { name = "David-GERARD", email = "david.gerard.23@ucl.ac.uk" }
 ]
 requires-python = ">=3.10,<3.14"
 dependencies = [
-    "ipykernel>=7.3.0",
-    "ipywidgets>=8.1.9",
     "photonforge>=1.3.2",
-    "csforge-si_220nm_passive",
+    "pyyaml>=6.0",
+    "tidy3d>=2.10",
 ]
+
 [dependency-groups]
 dev = [
     "pre-commit>=4.6.0",
@@ -24,24 +24,20 @@ docs = [
     "mkdocs>=1.6.1",
     "mkdocs-material>=9.5.0",
 ]
-
-[tool.uv]
-package = false
-
-[tool.uv.sources]
-csforge-si_220nm_active = { workspace = true }
-csforge-si_220nm_passive = { workspace = true }
-
-[tool.uv.workspace]
-members = [
-    "csforge-si_220nm_active",
-    "csforge-si_220nm_passive",
+notebooks = [
+    "ipykernel>=7.3.0",
+    "ipywidgets>=8.1.9",
+    "quarto>=0.1.0",
 ]
-
 
 [build-system]
 requires = ["uv_build>=0.11.7,<0.12.0"]
 build-backend = "uv_build"
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--import-mode=importlib"]
 
 
 [tool.ruff]

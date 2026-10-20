@@ -1,18 +1,12 @@
-"""Tests for the csforge_si_220nm_passive technology definition."""
+"""Tests for the cornerstone_forge.si_220nm_passive technology definition."""
 
-import pathlib
-
-import csforge_si_220nm_passive as pdk
 import photonforge as pf
 import pytest
 
-try:
-    import tomllib
-except ModuleNotFoundError:
-    import tomli as tomllib
-from csforge_si_220nm_passive._layers import _connections, _layer_specs, _thicknesses
-from csforge_si_220nm_passive._ports import _ports
-from csforge_si_220nm_passive.technology import csforge_si_220nm_pdk
+from cornerstone_forge import si_220nm_passive as pdk
+from cornerstone_forge.si_220nm_passive._layers import _connections, _layer_specs, _thicknesses
+from cornerstone_forge.si_220nm_passive._ports import _ports
+from cornerstone_forge.si_220nm_passive.technology import si_220nm_passive_pdk
 
 # ---------------------------------------------------------------------------
 # Load technology test
@@ -21,7 +15,7 @@ from csforge_si_220nm_passive.technology import csforge_si_220nm_pdk
 
 def test_load_technology():
     """Test that the technology can be loaded without errors."""
-    tech = pdk.csforge_si_220nm_pdk()
+    tech = pdk.si_220nm_passive_pdk()
     pf.config.default_technology = tech
     print(
         f"Loaded technology '{tech.name}' version"
@@ -37,7 +31,7 @@ def test_load_technology():
 
 def test_export(tmp_path):
     """Test that the technology can be exported and re-imported without loss of information."""
-    tech = pdk.csforge_si_220nm_pdk()
+    tech = pdk.si_220nm_passive_pdk()
     tech_file = tmp_path / "tech.phf"
     pf.write_phf(tech_file, tech)
     tech_loaded = pf.load_phf(tech_file)["technologies"][0]
@@ -184,48 +178,40 @@ def test_heater_contact_pad_connected():
 
 def test_technology_name():
     """Test that the technology has the expected name."""
-    tech = csforge_si_220nm_pdk()
-    assert tech.name == "csforge_si_220nm_passive"
-
-
-def _pyproject_version() -> str:
-    """Read the package version from csforge-si_220nm_passive/pyproject.toml."""
-    pyproject_path = pathlib.Path(__file__).parents[1] / "pyproject.toml"
-    with open(pyproject_path, "rb") as f:
-        data = tomllib.load(f)
-    return data["project"]["version"]
+    tech = si_220nm_passive_pdk()
+    assert tech.name == "cornerstone-si_220nm_passive-forge"
 
 
 def test_technology_version():
-    """Test that the technology version string is set to the package version."""
-    tech = csforge_si_220nm_pdk()
-    assert tech.version == _pyproject_version()
+    """Test that the technology version string is set to the subpackage version."""
+    tech = si_220nm_passive_pdk()
+    assert tech.version == pdk.__version__
 
 
 def test_technology_has_layers():
     """Test that the technology exposes all PDK layers."""
-    tech = csforge_si_220nm_pdk()
+    tech = si_220nm_passive_pdk()
     for layer_name in _layer_specs:
         assert layer_name in tech.layers, f"Layer '{layer_name}' missing from technology"
 
 
 def test_technology_has_ports():
     """Test that the technology exposes all port specs."""
-    tech = csforge_si_220nm_pdk()
+    tech = si_220nm_passive_pdk()
     for port_name in port_specs:
         assert port_name in tech.ports, f"Port spec '{port_name}' missing from technology"
 
 
 def test_technology_substrate_adds_two_extrusion():
     """Test that include_substrate=True adds exactly two extrusions to the stack."""
-    tech_no_sub = csforge_si_220nm_pdk(include_substrate=False)
-    tech_with_sub = csforge_si_220nm_pdk(include_substrate=True)
+    tech_no_sub = si_220nm_passive_pdk(include_substrate=False)
+    tech_with_sub = si_220nm_passive_pdk(include_substrate=True)
     assert len(tech_with_sub.extrusion_specs) == len(tech_no_sub.extrusion_specs) + 2
 
 
 def test_technology_export_roundtrip(tmp_path):
     """Test that the technology survives a write/load roundtrip without data loss."""
-    tech = csforge_si_220nm_pdk()
+    tech = si_220nm_passive_pdk()
     tech_file = tmp_path / "tech.phf"
     pf.write_phf(tech_file, tech)
     tech_loaded = pf.load_phf(tech_file)["technologies"][0]
@@ -235,7 +221,7 @@ def test_technology_export_roundtrip(tmp_path):
 def test_area_outside_of_layout_is_air():
     """Test that the area outside of the layout is assigned the background medium."""
     # Test that the background is air
-    tech = csforge_si_220nm_pdk()
+    tech = si_220nm_passive_pdk()
     assert tech.background_medium.permittivity == 1.0
 
     # Test that a point far outside the layout is assigned the background medium

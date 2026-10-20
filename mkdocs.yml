@@ -55,8 +55,9 @@ nav:
     - Tools: developers/tools.md
     - Installation: developers/installation.md
     - Build & Workflow: developers/build.md
+    - Notebooks: developers/notebooks.md
   - Users:
     - Installation: users/installation.md
     - Usage: users/usage.md
   - PDKs:
-    - SI 220nm Passive: pdks/csforge-si_220nm_passive.md
+    - SI 220nm Passive: pdks/si_220nm_passive.md

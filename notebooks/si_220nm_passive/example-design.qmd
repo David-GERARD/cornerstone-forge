@@ -1,0 +1,400 @@
+---
+title: CSForge — Example design
+jupyter: python3
+---
+
+**Author:** [David Gerard](https://profiles.ucl.ac.uk/95497-david-gerard) **Based on:** [PhotonForge Documentation - Cascaded Rings Filter](https://www.flexcompute.com/photonforge/doc/)
+
+## Overview
+
+```{python}
+import pathlib
+
+import matplotlib.pyplot as plt
+import numpy as np
+import tidy3d as td
+
+from cornerstone_forge import si_220nm_passive as pdk
+import photonforge as pf
+
+# Build the technology and set it globally
+tech = pdk.si_220nm_passive_pdk(include_substrate=True, sidewall_angle_si=0.0)
+pf.config.default_technology = tech
+
+# Guardrail: cells gated by `run_fdtd` submit simulations to the Tidy3D cloud and
+# consume FlexCredits. Set to True to run them.
+run_fdtd = False
+```
+
+```{python}
+wavelengths = np.linspace(1.548, 1.552, 81)
+port_spec = tech.ports["strip_1550nm"]
+```
+
+## Point Couplers
+
+Instead of solving the full cascaded problem in FDTD, we can solve for the two point couplers (i.e. coupling between the bus waveguide to ring waveguide and coupling between two ring waveguides).
+Then, we will be able to utilize the computed [S matrix](../guides/S_Parameters.ipynb) to dynamically vary the number of rings and run fast [circuit simulations](../guides/Circuit_Model.ipynb).
+
+We use [parametric components](../guides/Parametric_Component_Library.ipynb) to quickly design both couplers:
+- [ring_coupler](../_autosummary/photonforge.parametric.ring_coupler.rst) for the bus, and
+- [dual_ring_coupler](../_autosummary/photonforge.parametric.dual_ring_coupler.rst) for the inter-ring coupling.
+
+Note that we decrease the default mesh refinement from 20 to 15 minimal grid cells per wavelength to decrease the simulation size.
+That can slightly change the exact resonant frequencies of the filter, but fabrication imperfections usually have a much higher impact here, so that is not so important in this example.
+
+However, we define a smaller shut-off condition (10⁻⁷, instead of the default 10⁻⁵) to decrease residual fields in the simulation, and we increase the default run time quality factor to ensure enough time for the shut-off condition.
+These measures are necessary because we will combine the frequency-domain S parameters into resonant devices, where small numerical errors can be amplified and lead to non-passive responses (identifiable, for example, if we see any S parameter magnitude above unit).
+
+```{python}
+pf.config.default_mesh_refinement = 15
+
+# Default parameters for parametric components
+pf.config.default_kwargs = {
+    "port_spec": port_spec,
+    "radius": 10,
+    "coupling_distance": 0.6,  # measured between waveguide centers
+    "tidy3d": {
+        "run_time": td.RunTimeSpec(quality_factor=10),
+        "shutoff": 1e-7,
+    },
+}
+```
+
+```{python}
+bus_to_ring = pf.parametric.s_bend_ring_coupler(s_bend_offset=port_spec.width)
+bus_to_ring
+```
+
+```{python}
+ring_to_ring = pf.parametric.dual_ring_coupler()
+ring_to_ring
+```
+
+```{python}
+if run_fdtd:
+    fig, _ = pf.plot_s_matrix(bus_to_ring.s_matrix(pf.C_0 / wavelengths))
+    fig.suptitle("Bus to ring")
+
+    fig, _ = pf.plot_s_matrix(ring_to_ring.s_matrix(pf.C_0 / wavelengths))
+    _ = fig.suptitle("Ring to ring")
+```
+
+## Add drop filter
+
+Now that we have simulated S parameters for the point couplers, we use a netlist-driven layout to create an add-drop filter and look at the resonant response of the ring.
+The [component_from_netlist](../_autosummary/photonforge.component_from_netlist.rst) function can be used to build an add-drop filter component with a [circuit model](../_autosummary/photonforge.CircuitModel.rst).
+
+```{python}
+netlist_add_drop = {
+    "name": "add_drop",
+    "instances": [bus_to_ring, bus_to_ring],
+    "connections": [((1, "P1"), (0, "P3"))],
+    "ports": [
+        (0, "P0", "In"),
+        (0, "P2", "Through"),
+        (1, "P0", "Add"),
+        (1, "P2", "Drop"),
+    ],
+    "models": [pf.CircuitModel()],
+}
+
+add_drop = pf.component_from_netlist(netlist_add_drop)
+add_drop
+```
+
+Since we have added a Circuit model to the add-drop filter, PhotonForge automatically uses the S parameters that were already calculated for the instance components to calculate the circuit's S matrix.
+It will need to perform a few mode-solver calculations to make sure the correct phases are accounted for after instance rotations.
+
+```{python}
+if run_fdtd:
+    s_matrix_add_drop = add_drop.s_matrix(frequencies=pf.C_0 / wavelengths)
+    _ = pf.plot_s_matrix(s_matrix_add_drop, input_ports=["In"])
+```
+
+## Coupled Rings
+
+Next, we can create a coupled-ring filter to see the effect of cascading identical resonators.
+Again, we will use netlist helper to create the component. 
+
+```{python}
+netlist_coupled_rings = {
+    "name": "cascaded_ring_filter",
+    "instances": {
+        "bus_coupler0": bus_to_ring,
+        "bus_coupler1": bus_to_ring,
+        "ring_coupler0": ring_to_ring,
+        "ring_coupler1": ring_to_ring,
+    },
+    "connections": [
+        (("ring_coupler0", "P0"), ("bus_coupler0", "P1")),
+        (("ring_coupler1", "P0"), ("ring_coupler0", "P1")),
+        (("bus_coupler1", "P3"), ("ring_coupler1", "P1")),
+    ],
+    "ports": [
+        ("bus_coupler0", "P0", "In"),
+        ("bus_coupler1", "P2", "Drop"),
+        ("bus_coupler0", "P2", "Through"),
+        ("bus_coupler1", "P0", "Add"),
+    ],
+    "models": [pf.CircuitModel()],
+}
+
+
+coupled_rings = pf.component_from_netlist(netlist_coupled_rings)
+coupled_rings
+```
+
+```{python}
+if run_fdtd:
+    s_matrix_coupled_rings = coupled_rings.s_matrix(frequencies=pf.C_0 / wavelengths)
+    _ = pf.plot_s_matrix(s_matrix_coupled_rings, input_ports=["In"])
+```
+
+We can see how it is possible to change the filter response not just at the pass band but also modify it to achieve a sharp roll-off in the rejection band.
+
+```{python}
+if run_fdtd:
+    plt.plot(
+        wavelengths,
+        20 * np.log10(np.abs(s_matrix_add_drop[(f"In@0", f"Drop@0")])),
+        label=f"Single ring",
+    )
+    plt.plot(
+        wavelengths,
+        20 * np.log10(np.abs(s_matrix_coupled_rings[(f"In@0", f"Drop@0")])),
+        label=f"Coupled rings",
+    )
+    plt.xlabel("Wavelength (um)")
+    plt.ylabel("Transmission (dB)")
+    _ = plt.legend()
+```
+
+## Cascaded add-drop filters
+
+Another common configuration is to cascade the rings in series in the same bus waveguide, possibly with slightly different resonant frequencies.
+We will use a termination on one of the add/drop filter ports and connect a routing waveguide bend to the other, which can be used to connect to other parts of the circuit later.
+
+We start by creating the termination (from scratch) and the bend (using a parametric component):
+
+```{python}
+termination = pf.Component("Termination")
+termination.add("wg_lf", pf.stencil.linear_taper(20, (0.5, 0.1)))
+termination.add_port(pf.Port((0, 0), 0, port_spec))
+termination.add_model(pf.Tidy3DModel())
+termination
+```
+
+```{python}
+bend = pf.parametric.bend(name="Bend")
+bend
+```
+
+Now we create the terminated single add/drop filter as a parametric component, using an extra straight section in the ring to change the resonant frequency.
+Because of the simplicity of this component, we can still use a netlist-driven design.
+
+```{python}
+@pf.parametric_component
+def create_add_drop(*, added_length=0):
+    # Basic add-drop filter netlist
+    netlist = {
+        "instances": {
+            "bus_coupler0": bus_to_ring,
+            "bus_coupler1": bus_to_ring,
+            "bend0": bend,
+            "bend1": bend,
+            "termination": termination,
+        },
+        "connections": [
+            (("bus_coupler1", "P1"), ("bus_coupler0", "P3")),
+            (("bend1", "P0"), ("bus_coupler1", "P0")),
+            (("termination", "P0"), ("bend1", "P1")),
+            (("bend0", "P1"), ("bus_coupler1", "P2")),
+        ],
+        "ports": [
+            ("bus_coupler0", "P0"),
+            ("bus_coupler0", "P2"),
+            ("bend0", "P0", "Add/Drop"),
+        ],
+        "models": [pf.CircuitModel()],
+    }
+
+    if added_length > 0:
+        # If we need extra length, add 2 spacer instances to the netlist and
+        # re-connect the instances appropriately
+        spacer = pf.parametric.straight(length=added_length)
+        netlist["instances"]["spacer0"] = spacer
+        netlist["instances"]["spacer1"] = spacer
+
+        netlist["connections"] = [
+            (("spacer0", "P0"), ("bus_coupler0", "P1")),
+            (("spacer1", "P1"), ("bus_coupler0", "P3")),
+            (("bus_coupler1", "P1"), ("spacer1", "P0")),
+            (("bend1", "P0"), ("bus_coupler1", "P0")),
+            (("termination", "P0"), ("bend1", "P1")),
+            (("bend0", "P1"), ("bus_coupler1", "P2")),
+        ]
+    return pf.component_from_netlist(netlist)
+
+
+create_add_drop(added_length=5)
+```
+
+We connect 3 terminated rings with an appropriate spacer between them.
+Each ring has a different resonance.
+
+```{python}
+spacer = pf.parametric.straight(name="spacer", length=35)
+
+netlist_cascaded_rings = {
+    "name": "filter_circuit",
+    "instances": {
+        "AD0": create_add_drop(added_length=0.005),
+        "AD1": create_add_drop(added_length=0.015),
+        "AD2": create_add_drop(added_length=0.025),
+        "SP1": spacer,
+        "SP2": spacer,
+    },
+    "connections": [
+        (("SP1", "P0"), ("AD0", "P1")),
+        (("AD1", "P0"), ("SP1", "P1")),
+        (("SP2", "P0"), ("AD1", "P1")),
+        (("AD2", "P0"), ("SP2", "P1")),
+    ],
+    "ports": [
+        ("AD0", "P0"),
+        ("AD2", "P1"),
+        ("AD0", "Add/Drop", "AD0"),
+        ("AD1", "Add/Drop", "AD1"),
+        ("AD2", "Add/Drop", "AD2"),
+    ],
+    "models": [pf.CircuitModel()],
+}
+
+cascaded_rings = pf.component_from_netlist(netlist_cascaded_rings)
+cascaded_rings
+```
+
+```{python}
+if run_fdtd:
+    _ = pf.plot_s_matrix(cascaded_rings.s_matrix(pf.C_0 / wavelengths), input_ports=["P0"])
+```
+
+The warnings can be safely ignored in this case, because our waveguides don't really end at the boundaries, but continue through the absorbing layers through adjacent structures.
+
+## Complete Design
+
+Finally, we will include [grating couplers](Grating_Coupler.ipynb) to the cascaded filter that can be used to couple light into and out of the chip.
+The Cornerstone PDK already provides a grating designed for the port specification we chose, so we don't have to design it from scratch:
+
+```{python}
+grating_coupler = pdk.component("SOI220nm_1550nm_TE_STRIP_Grating_Coupler")
+grating_coupler
+```
+
+The grating can be easily simulated in Tidy3D just as we did with other components, but because of its size, we will demonstrate the flexibility in PhotonForge to use pre-computed or experimental data from Touchstone files using a [data model](../guides/Data_Model.ipynb).
+
+In order to facilitate the distribution of this example, the file data is embedded here, so we will first write it to a file (this data file would have been provided by previous computations or experiments).
+
+```{python}
+print(grating_coupler.active_model)
+```
+
+```{python}
+wavelengths_dense = np.linspace(1.525, 1.575, 1001)
+
+_ = pf.plot_s_matrix(
+    grating_coupler.s_matrix(pf.C_0 / wavelengths_dense), y="dB", input_ports=["P1"]
+)
+```
+
+```{python}
+netlist_layout = {
+    "name": "main",
+    "instances": {
+        "filter": cascaded_rings,
+        "grating0": grating_coupler,
+        "grating1": grating_coupler,
+        "spacer0": spacer,
+        "spacer1": spacer,
+    },
+    "connections": [
+        (("spacer0", "P0"), ("grating0", "P1")),
+        (("filter", "P0"), ("spacer0", "P1")),
+        (("spacer1", "P0"), ("filter", "P1")),
+        (("grating1", "P1"), ("spacer1", "P1")),
+    ],
+    "ports": [
+        ("grating0", "FPvertical_TE"),
+        ("grating1", "FPvertical_TE"),
+        ("filter", "AD0"),
+        ("filter", "AD1"),
+        ("filter", "AD2"),
+    ],
+    "models": [pf.CircuitModel()],
+}
+
+layout = pf.component_from_netlist(netlist_layout)
+
+# layout.write_gds("cascaded_rings.gds")
+```
+
+Once again, we can simulate our full device, but now with a denser and wider wavelength grid to verify the full transmission spectrum between grating couplers.
+Note that this simulation may take a little longer because we are calculating modes using a fine frequency sweep.
+
+```{python}
+if run_fdtd:
+    wavelengths_wide = np.linspace(1.525, 1.575, 501)
+    s_layout = layout.s_matrix(frequencies=pf.C_0 / wavelengths_wide)
+```
+
+```{python}
+if run_fdtd:
+    _, ax = plt.subplots(1, 1, figsize=(9, 3))
+    ax.plot(wavelengths_wide, 20 * np.log10(np.abs(s_layout["P0@0", "P1@0"])))
+    _ = ax.set(xlabel="Wavelength (μm)", ylabel="Transmission (dB)", ylim=(-30, None))
+```
+
+We see that overall filter response has a spectral dependence due to the wavelength response of the grating.
+
+## Testing Variations
+
+The Circuit model allows us to test the effect of parameter changes in technologies, components, and models in specific references through the `updates` keyword argument available in the Circuit model's [start](../_autosummary/photonforge.CircuitModel.rst#photonforge.CircuitModel.start) method.
+
+In this case we want to see the effect of changing the resonance frequency of each ring in the filter circuit by modifying the added lengths in each of them.
+For that, we set a dictionary of updates that first matches each add/drop filter by name (`"create_add_drop_…"`) at any depth of the dependency tree (the value `None` in the reference specification tuple indicates that whatever follows ca match at any depth).
+Within each add/drop filter, we select references whose component name starts with "straight" using a regular expression (`.*` will match any suffix), and, finally, update the model of those components (which are [Waveguide models](../_autosummary/photonforge.WaveguideModel.rst)) with a new length parameter.
+
+```{python}
+if run_fdtd:
+    updates = {
+        (None, "create_add_drop_added_length_0_005", "straight.*"): {"model_updates": {"length": 0.0}},
+        (None, "create_add_drop_added_length_0_015", "straight.*"): {"model_updates": {"length": 0.02}},
+        (None, "create_add_drop_added_length_0_025", "straight.*"): {"model_updates": {"length": 0.06}},
+    }
+    updated_s_matrix = layout.s_matrix(
+        pf.C_0 / wavelengths_wide, model_kwargs={"updates": updates}
+    )
+
+    _, ax = plt.subplots(1, 1, figsize=(9, 3))
+    ax.plot(wavelengths_wide, 20 * np.log10(np.abs(updated_s_matrix["P0@0", "P1@0"])))
+    _ = ax.set(xlabel="Wavelength (μm)", ylabel="Transmission (dB)", ylim=(-30, None))
+```
+
+Because we created each add/drop filter as a parametric component with the `added_length` parameter, we could also obtain the same result by updating the component themselves:
+
+```{python}
+if run_fdtd:
+    updates = {
+        (None, "create_add_drop_added_length_0_005"): {"component_updates": {"added_length": 0.0}},
+        (None, "create_add_drop_added_length_0_015"): {"component_updates": {"added_length": 0.02}},
+        (None, "create_add_drop_added_length_0_025"): {"component_updates": {"added_length": 0.06}},
+    }
+    updated_s_matrix = layout.s_matrix(
+        pf.C_0 / wavelengths_wide, model_kwargs={"updates": updates}
+    )
+
+    _, ax = plt.subplots(1, 1, figsize=(9, 3))
+    ax.plot(wavelengths_wide, 20 * np.log10(np.abs(updated_s_matrix["P0@0", "P1@0"])))
+    _ = ax.set(xlabel="Wavelength (μm)", ylabel="Transmission (dB)", ylim=(-30, None))
+```

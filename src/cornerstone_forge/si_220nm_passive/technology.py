@@ -1,6 +1,6 @@
 """Parametric technology definition for Cornerstone's SI 220nm passive PDK.
 
-Exposes ``csforge_si_220nm_pdk``, a ``@pf.parametric_technology`` factory that assembles
+Exposes ``si_220nm_passive_pdk``, a ``@pf.parametric_technology`` factory that assembles
 layers, extrusion specs (waveguide, rib slab, EBL/DUV gratings, heater filaments, and
 contact pads), port specs, and background medium into a ``pf.Technology`` object.
 
@@ -26,7 +26,7 @@ technology_version = "0.2.10"
 
 
 @pf.parametric_technology
-def csforge_si_220nm_pdk(
+def si_220nm_passive_pdk(
     box_thickness: pft.PositiveDimension = _thicknesses["box"],
     waveguide_thickness: pft.PositiveDimension = _thicknesses["strip"],
     rib_slab_thickness: pft.PositiveDimension = _thicknesses["rib_slab"],
@@ -338,7 +338,7 @@ def csforge_si_220nm_pdk(
     ]
 
     technology = pf.Technology(
-        name="csforge_si_220nm_passive",
+        name="cornerstone-si_220nm_passive-forge",
         version=technology_version,
         layers=layers,
         extrusion_specs=extrusion_specs,
@@ -352,7 +352,7 @@ def csforge_si_220nm_pdk(
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
-    tech = csforge_si_220nm_pdk(include_substrate=False)
+    tech = si_220nm_passive_pdk(include_substrate=False)
     pf.config.default_technology = tech
     from photonforge.live_viewer import LiveViewer
 

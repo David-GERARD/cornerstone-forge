@@ -344,7 +344,7 @@ def si_220nm_passive_pdk(
         extrusion_specs=extrusion_specs,
         ports=_ports(thicknesses),
         background_medium=media["air"],
-        connections=_connections,
+        connected_layers=_connections,
     )
     return technology
 

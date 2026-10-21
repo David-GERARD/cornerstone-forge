@@ -2,6 +2,7 @@
 
 import photonforge as pf
 import pytest
+from photonforge._live_viewer import pdks as live_viewer_pdks
 
 from cornerstone_forge import si_220nm_passive as pdk
 from cornerstone_forge.si_220nm_passive._layers import _connections, _layer_specs, _thicknesses
@@ -22,6 +23,23 @@ def test_load_technology():
         f"{tech.version} with {len(tech.layers)} layers"
         f" and {len(tech.ports)} port specs."
     )
+
+
+# ---------------------------------------------------------------------------
+# LiveViewer test
+# ---------------------------------------------------------------------------
+
+
+def test_technology_loaded_in_liveviewer():
+    """Test that the LiveViewer finds this PDK and loads its technology."""
+    installed = {p["name"]: p for p in live_viewer_pdks.installed()}
+    assert "cornerstone-forge" in installed, "PDK not discovered by the LiveViewer"
+    pdk_info = installed["cornerstone-forge"]
+    assert pdk_info["compatible"], pdk_info["reason"]
+
+    result = live_viewer_pdks.load(pdk_info)
+    assert "error" not in result, result.get("error")
+    assert result["technology"] == si_220nm_passive_pdk().name
 
 
 # ---------------------------------------------------------------------------

@@ -1,6 +1,7 @@
 """Shared utilities for importing PDK components from GDS files."""
 
 import csv as _csv
+import functools
 import pathlib
 import re as _re
 import warnings
@@ -14,6 +15,38 @@ _DATA_DIR = pathlib.Path(__file__).parent / "data" / "sparams"
 
 _SPARAM_COL_RE = _re.compile(r"^s_(\d+)@TE0_(\d+)@TE0_(re|im)$")
 
+# GDS layers removed from the Cornerstone process, mapped to their replacement.
+# Layer (60, 0) [Si_Etch0_EBL_DF_94nm] (EBL gratings) was removed from the SOI220P process;
+# gratings are now defined on layer (6, 0) [Si_Etch1_DUV_DF_70nm].
+# See https://github.com/David-GERARD/cornerstone-forge/issues/23
+_LEGACY_LAYER_MAP = {(60, 0): (6, 0)}
+
+_DEPRECATION_ISSUE_URL = "https://github.com/David-GERARD/cornerstone-forge/issues/23"
+
+
+def _deprecated_cell(factory):
+    """Mark a PDK cell factory as deprecated (old Cornerstone naming convention).
+
+    The wrapped factory emits a :class:`FutureWarning` (shown to end users by
+    default) every time it is called.  Upstream Cornerstone renamed its PDK
+    cells in the ``SOI220P`` release; cells still using the old naming
+    convention will be replaced and eventually removed.
+    """
+
+    @functools.wraps(factory)
+    def wrapper(*args, **kwargs):
+        warnings.warn(
+            f"PDK cell '{factory.__name__}' uses the deprecated Cornerstone naming convention "
+            "and will be replaced by its SOI220P equivalent in a future release. "
+            f"See {_DEPRECATION_ISSUE_URL}",
+            FutureWarning,
+            stacklevel=2,
+        )
+        return factory(*args, **kwargs)
+
+    wrapper.deprecated = True
+    return wrapper
+
 
 def _import_component_with_ports(component_name: str, tech: pf.Technology) -> pf.Component:
     """Import a PDK component from its GDS file and attach its ports from the YAML spec.
@@ -26,6 +59,10 @@ def _import_component_with_ports(component_name: str, tech: pf.Technology) -> pf
     the YAML ``orientation`` field as ``(orientation + 180) % 360``, i.e. the
     direction power travels *into* the component, opposite to the outward port
     normal.
+
+    Geometry on GDS layers removed from the Cornerstone process is remapped to
+    the replacement layer (see ``_LEGACY_LAYER_MAP``); in particular, layer
+    ``(60, 0)`` (EBL gratings) is remapped to layer ``(6, 0)`` (DUV gratings).
 
     Args:
         component_name: Name of the component, matching the GDS cell name and
@@ -51,6 +88,9 @@ def _import_component_with_ports(component_name: str, tech: pf.Technology) -> pf
 
     components = pf.load_layout(str(gds_path), technology=tech)
     component = components[component_name]
+
+    # Remap layers removed from the process (e.g. 60 -> 6); no-op when absent.
+    component.remap_layers(_LEGACY_LAYER_MAP, include_dependencies=True)
 
     if not yaml_path.exists():
         warnings.warn(

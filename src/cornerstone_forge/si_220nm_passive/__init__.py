@@ -40,10 +40,9 @@ def plot_cross_section(technology=None):
     c.add(
         "wg_lf",
         pf.Rectangle((0.0, -2.0), (3.0, 2.0)),
-        "grating_ebl",
+        "grating_duv",
         pf.Rectangle((0.2, -2.0), (0.4, 2.0)),
         pf.Rectangle((0.6, -2.0), (0.8, 2.0)),
-        "grating_duv",
         pf.Rectangle((1.2, -2.0), (1.4, 2.0)),
         pf.Rectangle((1.6, -2.0), (1.8, 2.0)),
     )

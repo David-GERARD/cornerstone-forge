@@ -157,6 +157,19 @@ def test_layer_numbers_unique():
         seen[key] = name
 
 
+def test_layer_60_removed():
+    """Test that GDS layer 60 (EBL gratings) is no longer part of the technology (issue #23)."""
+    assert "grating_ebl" not in _layer_specs
+    assert all(tuple(spec.layer) != (60, 0) for spec in _layer_specs.values())
+    assert _layer_specs["grating_duv"].layer == (6, 0)
+
+
+def test_ebeam_gratings_thickness_deprecated():
+    """Test that overriding the removed EBL grating thickness emits a deprecation warning."""
+    with pytest.warns(FutureWarning, match="ebeam_gratings_thickness"):
+        si_220nm_passive_pdk(ebeam_gratings_thickness=0.1)
+
+
 # ---------------------------------------------------------------------------
 # Layer thicknesses
 # ---------------------------------------------------------------------------

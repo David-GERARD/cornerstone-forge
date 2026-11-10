@@ -12,7 +12,6 @@ from ._layers import _layer_specs
 
 # MASKS FOR EXTRUSIONS
 _masks_layers = {
-    "grating_ebl": pf.MaskSpec(_layer_specs["grating_ebl"].layer),
     "grating_duv": pf.MaskSpec(_layer_specs["grating_duv"].layer),
     "wg_lf": pf.MaskSpec(_layer_specs["wg_lf"].layer),
     "wg_df": pf.MaskSpec(_layer_specs["wg_df"].layer),
@@ -27,35 +26,22 @@ _masks = {}
 
 # Passive layers
 _masks["substrate"] = _masks_layers["FloorPlan"]
-_masks["strip"] = (_masks_layers["wg_lf"] - _masks_layers["wg_df"]) * (
-    -_masks_layers["grating_ebl"] - _masks_layers["grating_duv"]
-)
-_masks["ebeam_gratings"] = (_masks_layers["wg_lf"] + -_masks_layers["wg_df"]) * _masks_layers[
-    "grating_ebl"
-]
+_masks["strip"] = (_masks_layers["wg_lf"] - _masks_layers["wg_df"]) * -_masks_layers["grating_duv"]
 _masks["duv_gratings"] = (_masks_layers["wg_lf"] + -_masks_layers["wg_df"]) * _masks_layers[
     "grating_duv"
 ]
-_masks["rib_slab"] = _masks_layers["rib_slab"] * -(
-    _masks["strip"] + _masks["ebeam_gratings"] + _masks["duv_gratings"]
-)
+_masks["rib_slab"] = _masks_layers["rib_slab"] * -(_masks["strip"] + _masks["duv_gratings"])
 _masks["box"] = (
-    _masks["strip"]
-    + _masks["rib_slab"]
-    + _masks["ebeam_gratings"]
-    + _masks["duv_gratings"]
-    + _masks_layers["FloorPlan"]
+    _masks["strip"] + _masks["rib_slab"] + _masks["duv_gratings"] + _masks_layers["FloorPlan"]
 ) ** 1.0  # dilate the box mask by 1um to ensure it fully covers the area outside the waveguides,
 # gratings, and rib slab
 
 # Heaters
 _masks["heater_fil_waveguide"] = _masks_layers["heater_fil"] * _masks["strip"]
-_masks["heater_fil_ebeam_gratings"] = _masks_layers["heater_fil"] * _masks["ebeam_gratings"]
 _masks["heater_fil_duv_gratings"] = _masks_layers["heater_fil"] * _masks["duv_gratings"]
 _masks["heater_fil_rib_slab"] = _masks_layers["heater_fil"] * _masks["rib_slab"]
 _masks["heater_fil_box"] = _masks_layers["heater_fil"] * -(
     _masks["heater_fil_waveguide"]
-    + _masks["heater_fil_ebeam_gratings"]
     + _masks["heater_fil_duv_gratings"]
     + _masks["heater_fil_rib_slab"]
 )
@@ -67,9 +53,6 @@ _masks["contact_pad_waveguide"] = (
 _masks["contact_pad_rib_slab"] = (
     _masks_layers["contact_pad"] * _masks["rib_slab"] * (-_masks_layers["heater_fil"])
 )
-_masks["contact_pad_ebeam_gratings"] = (
-    _masks_layers["contact_pad"] * _masks["ebeam_gratings"] * (-_masks_layers["heater_fil"])
-)
 _masks["contact_pad_duv_gratings"] = (
     _masks_layers["contact_pad"] * _masks["duv_gratings"] * (-_masks_layers["heater_fil"])
 )
@@ -79,7 +62,6 @@ _masks["contact_pad_box"] = (
 mask_contact_pads_no_heaters = (
     _masks["contact_pad_waveguide"]
     + _masks["contact_pad_rib_slab"]
-    + _masks["contact_pad_ebeam_gratings"]
     + _masks["contact_pad_duv_gratings"]
     + _masks["contact_pad_box"]
 )
@@ -94,12 +76,6 @@ _masks["contact_pad_heater_fil_waveguide"] = (
 _masks["contact_pad_heater_fil_rib_slab"] = (
     _masks_layers["contact_pad"]
     * _masks["rib_slab"]
-    * _masks_layers["heater_fil"]
-    * -mask_contact_pads_no_heaters
-)
-_masks["contact_pad_heater_fil_ebeam_gratings"] = (
-    _masks_layers["contact_pad"]
-    * _masks["ebeam_gratings"]
     * _masks_layers["heater_fil"]
     * -mask_contact_pads_no_heaters
 )

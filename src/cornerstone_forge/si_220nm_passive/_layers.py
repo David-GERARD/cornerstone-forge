@@ -76,15 +76,9 @@ patterns = {
 }
 
 _layer_specs = {
-    "grating_ebl": pf.LayerSpec(
-        layer=(60, 0),
-        description=(
-            "[Si_Etch0_EBL_DF_94nm] EBL-defined grating couplers."
-            "Dark-field: layer will be etched. For gaps > 0.35, there is no max feature size."
-        ),
-        color="#00805018",
-        pattern=patterns["I15"],
-    ),
+    # Layer (60, 0) [Si_Etch0_EBL_DF_94nm] (EBL gratings) was removed from the Cornerstone
+    # SOI220P process: gratings are on layer (6, 0). Legacy GDS cells drawn on layer 60 are
+    # remapped to layer 6 on import (see ``_utils._LEGACY_LAYER_MAP``).
     "grating_duv": pf.LayerSpec(
         layer=(6, 0),
         description=(
@@ -167,7 +161,7 @@ _thicknesses = {
     "box": 3.0,
     "strip": 0.22,
     "rib_slab": 0.1,
-    "ebeam_gratings": 0.125,
+    "ebeam_gratings": 0.125,  # Deprecated: EBL gratings (layer 60) removed from the process
     "duv_gratings": 0.15,
     "tox": 2.0,
     "heater_fil": 0.15,

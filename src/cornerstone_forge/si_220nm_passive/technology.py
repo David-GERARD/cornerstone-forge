@@ -1,7 +1,7 @@
 """Parametric technology definition for Cornerstone's SI 220nm passive PDK.
 
 Exposes ``si_220nm_passive_pdk``, a ``@pf.parametric_technology`` factory that assembles
-layers, extrusion specs (waveguide, rib slab, EBL/DUV gratings, heater filaments, and
+layers, extrusion specs (waveguide, rib slab, DUV gratings, heater filaments, and
 contact pads), port specs, and background medium into a ``pf.Technology`` object.
 
 Every layer thickness, the silicon sidewall angle (default 5°), and each optical or
@@ -10,6 +10,7 @@ electrical medium can be overridden individually via keyword arguments.  Setting
 extends from ``-pf.Z_INF`` to the bottom of the BOX layer.
 """
 
+import warnings
 from typing import Literal
 
 import photonforge as pf
@@ -22,7 +23,7 @@ from ._ports import _ports
 
 _MediumType = pft.Medium | dict[Literal["optical", "electrical"], pft.Medium]
 
-technology_version = "0.2.10"
+technology_version = "0.2.11"
 
 
 @pf.parametric_technology
@@ -50,7 +51,9 @@ def si_220nm_passive_pdk(
         box_thickness: Thickness of the BOX layer in um.
         waveguide_thickness: Thickness of the strip waveguide layer in um.
         rib_slab_thickness: Thickness of the rib slab layer in um.
-        ebeam_gratings_thickness: Thickness of the e-beam gratings layer in um.
+        ebeam_gratings_thickness: Deprecated and ignored. EBL gratings (GDS layer 60) were
+            removed from the Cornerstone process; gratings are defined on layer 6 (DUV) and
+            use ``duv_gratings_thickness``.
         duv_gratings_thickness: Thickness of the DUV gratings layer in um.
         tox_thickness: Thickness of the top oxide SiO2 layer in um.
         heater_fil_thickness: Thickness of the heater filament layer in um.
@@ -68,6 +71,14 @@ def si_220nm_passive_pdk(
         A parametric technology object.
 
     """
+    if ebeam_gratings_thickness != _thicknesses["ebeam_gratings"]:
+        warnings.warn(
+            "'ebeam_gratings_thickness' is deprecated and ignored: EBL gratings (GDS layer 60) "
+            "were removed from the Cornerstone process. Use 'duv_gratings_thickness' instead.",
+            FutureWarning,
+            stacklevel=2,
+        )
+
     masks = _masks
 
     layers = {k: v.copy() for k, v in _layer_specs.items()}
@@ -84,7 +95,6 @@ def si_220nm_passive_pdk(
         "box": box_thickness,
         "strip": waveguide_thickness,
         "rib_slab": rib_slab_thickness,
-        "ebeam_gratings": ebeam_gratings_thickness,
         "duv_gratings": duv_gratings_thickness,
         "tox": tox_thickness,
         "heater_fil": heater_fil_thickness,
@@ -145,12 +155,6 @@ def si_220nm_passive_pdk(
             limits=(0, thicknesses["duv_gratings"]),
             sidewall_angle=sidewall_angle_si,
         ),
-        pf.ExtrusionSpec(
-            mask_spec=masks["ebeam_gratings"],
-            medium=media["si"],
-            limits=(0, thicknesses["ebeam_gratings"]),
-            sidewall_angle=sidewall_angle_si,
-        ),
     ]
 
     # Add extra extrusions to match the tox with the si layer
@@ -165,15 +169,6 @@ def si_220nm_passive_pdk(
             mask_spec=masks["rib_slab"],
             medium=media["sio2"],
             limits=(thicknesses["tox"], thicknesses["rib_slab"] + thicknesses["tox"]),
-            sidewall_angle=0.0,
-        ),
-        pf.ExtrusionSpec(
-            mask_spec=masks["ebeam_gratings"],
-            medium=media["sio2"],
-            limits=(
-                thicknesses["tox"],
-                thicknesses["ebeam_gratings"] + thicknesses["tox"],
-            ),
             sidewall_angle=0.0,
         ),
         pf.ExtrusionSpec(
@@ -202,15 +197,6 @@ def si_220nm_passive_pdk(
             limits=(
                 thicknesses["rib_slab"] + thicknesses["tox"],
                 thicknesses["rib_slab"] + thicknesses["tox"] + thicknesses["contact_pad"],
-            ),
-            sidewall_angle=0.0,
-        ),
-        pf.ExtrusionSpec(
-            mask_spec=masks["contact_pad_ebeam_gratings"],
-            medium=media["al"],
-            limits=(
-                thicknesses["ebeam_gratings"] + thicknesses["tox"],
-                thicknesses["ebeam_gratings"] + thicknesses["tox"] + thicknesses["contact_pad"],
             ),
             sidewall_angle=0.0,
         ),
@@ -257,18 +243,6 @@ def si_220nm_passive_pdk(
             sidewall_angle=0.0,
         ),
         pf.ExtrusionSpec(
-            mask_spec=masks["contact_pad_heater_fil_ebeam_gratings"],
-            medium=media["al"],
-            limits=(
-                thicknesses["ebeam_gratings"] + thicknesses["tox"],
-                thicknesses["ebeam_gratings"]
-                + thicknesses["tox"]
-                + thicknesses["heater_fil"]
-                + thicknesses["contact_pad"],
-            ),
-            sidewall_angle=0.0,
-        ),
-        pf.ExtrusionSpec(
             mask_spec=masks["contact_pad_heater_fil_duv_gratings"],
             medium=media["al"],
             limits=(
@@ -308,15 +282,6 @@ def si_220nm_passive_pdk(
             limits=(
                 thicknesses["rib_slab"] + thicknesses["tox"],
                 thicknesses["rib_slab"] + thicknesses["tox"] + thicknesses["heater_fil"],
-            ),
-            sidewall_angle=sidewall_angle_tin,
-        ),
-        pf.ExtrusionSpec(
-            mask_spec=masks["heater_fil_ebeam_gratings"],
-            medium=media["tin"],
-            limits=(
-                thicknesses["ebeam_gratings"] + thicknesses["tox"],
-                thicknesses["ebeam_gratings"] + thicknesses["tox"] + thicknesses["heater_fil"],
             ),
             sidewall_angle=sidewall_angle_tin,
         ),
@@ -369,10 +334,9 @@ if __name__ == "__main__":
     c.add(
         "wg_lf",
         pf.Rectangle((0.0, -2.0), (3.0, 2.0)),
-        "grating_ebl",
+        "grating_duv",
         pf.Rectangle((0.2, -2.0), (0.4, 2.0)),
         pf.Rectangle((0.6, -2.0), (0.8, 2.0)),
-        "grating_duv",
         pf.Rectangle((1.2, -2.0), (1.4, 2.0)),
         pf.Rectangle((1.6, -2.0), (1.8, 2.0)),
     )

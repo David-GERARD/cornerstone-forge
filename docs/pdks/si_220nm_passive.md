@@ -40,7 +40,6 @@ The SOI 220 nm passive process uses a standard Silicon-on-Insulator stack. Nomin
 | Buried oxide (BOX) | `box` | 3.00 | SiO₂ | Below Si device layer |
 | Strip waveguide | `strip` | 0.22 | Si | Full-etch — 220 nm |
 | Rib slab | `rib_slab` | 0.10 | Si | Partial-etch slab |
-| EBL gratings | `ebeam_gratings` | 0.125 | Si | Shallow e-beam etch |
 | DUV gratings | `duv_gratings` | 0.150 | Si | Shallow DUV etch |
 | Top oxide (TOX) | `tox` | 2.00 | SiO₂ | Upper cladding |
 | Heater filament | `heater_fil` | 0.15 | TiN | Above TOX |
@@ -50,9 +49,11 @@ The SOI 220 nm passive process uses a standard Silicon-on-Insulator stack. Nomin
 
 ## Layer map
 
+!!! warning "GDS layer 60 removed"
+    Layer `(60, 0)` `Si_Etch0_EBL_DF_94nm` (EBL gratings, formerly `grating_ebl`) is no longer part of the Cornerstone SOI220P process. Gratings are defined on layer `(6, 0)` (`grating_duv`). Legacy PDK cells drawn on layer 60 are remapped to layer 6 on import. See [issue #23](https://github.com/David-GERARD/cornerstone-forge/issues/23).
+
 | Alias | GDS Layer | Description |
 |-------|-----------|-------------|
-| `grating_ebl` | (60, 0) | EBL grating couplers — dark-field, 94 nm etch |
 | `grating_duv` | (6, 0) | DUV grating couplers — dark-field, 70 nm etch |
 | `wg_lf` | (3, 0) | Waveguide — light-field, 120 nm etch |
 | `wg_df` | (4, 0) | Waveguide — dark-field, 120 nm etch |
@@ -97,7 +98,7 @@ All parameters have process-nominal defaults and can be overridden individually:
 | `box_thickness` | 3.00 µm | BOX layer thickness |
 | `waveguide_thickness` | 0.22 µm | Strip Si thickness |
 | `rib_slab_thickness` | 0.10 µm | Rib slab thickness |
-| `ebeam_gratings_thickness` | 0.125 µm | EBL grating etch depth |
+| `ebeam_gratings_thickness` | 0.125 µm | **Deprecated, ignored** (EBL gratings removed from the process) |
 | `duv_gratings_thickness` | 0.150 µm | DUV grating etch depth |
 | `tox_thickness` | 2.00 µm | Top oxide thickness |
 | `heater_fil_thickness` | 0.15 µm | TiN heater thickness |
@@ -113,6 +114,9 @@ All parameters have process-nominal defaults and can be overridden individually:
 ---
 
 ## Component catalogue
+
+!!! warning "Deprecated naming convention"
+    Cornerstone renamed its PDK cells in the SOI220P release. All cells below using the old naming convention (`SOI220nm_*`, `Cell0_SOI220_Full_1550nm_Packaging_Template`) are deprecated and emit a `FutureWarning` when instantiated. They will be replaced by their SOI220P equivalents in a future release. See [issue #23](https://github.com/David-GERARD/cornerstone-forge/issues/23).
 
 ### O-band — 1310 nm
 
@@ -150,6 +154,7 @@ All parameters have process-nominal defaults and can be overridden individually:
 | `SOI220nm_1550nm_TE_STRIP_MZI` | MZI with heater | STRIP | e1, e2 | `dc` |
 | `SOI220nm_1550nm_TE_STRIP_Waveguide` | Straight waveguide | STRIP | o1, o2 | `strip_1550nm` |
 | `SOI220nm_1550nm_TE_STRIP_Waveguide_Crossing` | Waveguide crossing | STRIP | o1, o2, o3, o4 | `strip_1550nm` |
+| `SOI220_1550nm_TE_strip_apodized_GC_focusing_v1p0` | Apodized focusing GC (SOI220P) | STRIP | o1 | `strip_1550nm` |
 
 **Note on MZI ports:** The MZI components expose electrical `dc` ports (`e1`, `e2`) for the integrated TiN heater. The waveguide input/output connections are internal to the GDS cell.
 

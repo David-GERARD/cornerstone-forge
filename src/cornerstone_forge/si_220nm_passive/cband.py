@@ -2,12 +2,13 @@
 
 import photonforge as pf
 
-from ._utils import _import_component_with_ports, _load_data_model
+from ._utils import _deprecated_cell, _import_component_with_ports, _load_data_model
 
 components = {}
 
 
 ####################################################################
+@_deprecated_cell
 def SOI220nm_1550nm_TE_RIB_2x1_MMI(tech: pf.Technology) -> pf.Component:
     """2x1 MMI splitter, TE RIB waveguide, 1550 nm."""
     mmi = _import_component_with_ports("SOI220nm_1550nm_TE_RIB_2x1_MMI", tech)
@@ -22,6 +23,7 @@ components["SOI220nm_1550nm_TE_RIB_2x1_MMI"] = SOI220nm_1550nm_TE_RIB_2x1_MMI
 
 
 ####################################################################
+@_deprecated_cell
 def SOI220nm_1550nm_TE_RIB_2x2_MMI(tech: pf.Technology) -> pf.Component:
     """2x2 MMI splitter, TE RIB waveguide, 1550 nm."""
     mmi = _import_component_with_ports("SOI220nm_1550nm_TE_RIB_2x2_MMI", tech)
@@ -43,6 +45,7 @@ components["SOI220nm_1550nm_TE_RIB_2x2_MMI"] = SOI220nm_1550nm_TE_RIB_2x2_MMI
 
 
 ####################################################################
+@_deprecated_cell
 def SOI220nm_1550nm_TE_RIB_90_Degree_Bend(tech: pf.Technology) -> pf.Component:
     """90-degree bend, TE RIB waveguide, 1550 nm."""
     bend = _import_component_with_ports("SOI220nm_1550nm_TE_RIB_90_Degree_Bend", tech)
@@ -57,6 +60,7 @@ components["SOI220nm_1550nm_TE_RIB_90_Degree_Bend"] = SOI220nm_1550nm_TE_RIB_90_
 
 
 ####################################################################
+@_deprecated_cell
 def SOI220nm_1550nm_TE_RIB_EBL_Apodised_Grating_Coupler(tech: pf.Technology) -> pf.Component:
     """EBL apodised grating coupler, TE RIB waveguide, 1550 nm."""
     # TODO: Add port symmetries once fiber ports are added to the component definition
@@ -69,6 +73,7 @@ components["SOI220nm_1550nm_TE_RIB_EBL_Apodised_Grating_Coupler"] = (
 
 
 ####################################################################
+@_deprecated_cell
 def SOI220nm_1550nm_TE_RIB_Grating_Coupler(tech: pf.Technology) -> pf.Component:
     """Grating coupler, TE RIB waveguide, 1550 nm.
 
@@ -83,6 +88,7 @@ components["SOI220nm_1550nm_TE_RIB_Grating_Coupler"] = SOI220nm_1550nm_TE_RIB_Gr
 
 
 ####################################################################
+@_deprecated_cell
 def SOI220nm_1550nm_TE_RIB_MZI(tech: pf.Technology) -> pf.Component:
     """Mach-Zehnder interferometer, TE RIB waveguide, 1550 nm.
 
@@ -98,6 +104,7 @@ components["SOI220nm_1550nm_TE_RIB_MZI"] = SOI220nm_1550nm_TE_RIB_MZI
 
 
 ####################################################################
+@_deprecated_cell
 def SOI220nm_1550nm_TE_RIB_Waveguide(tech: pf.Technology) -> pf.Component:
     """Straight waveguide, TE RIB, 1550 nm."""
     straight = _import_component_with_ports("SOI220nm_1550nm_TE_RIB_Waveguide", tech)
@@ -109,6 +116,7 @@ components["SOI220nm_1550nm_TE_RIB_Waveguide"] = SOI220nm_1550nm_TE_RIB_Waveguid
 
 
 ####################################################################
+@_deprecated_cell
 def SOI220nm_1550nm_TE_RIB_Waveguide_Crossing(tech: pf.Technology) -> pf.Component:
     """Waveguide crossing, TE RIB, 1550 nm."""
     crossing = _import_component_with_ports("SOI220nm_1550nm_TE_RIB_Waveguide_Crossing", tech)
@@ -124,6 +132,7 @@ components["SOI220nm_1550nm_TE_RIB_Waveguide_Crossing"] = SOI220nm_1550nm_TE_RIB
 
 
 ####################################################################
+@_deprecated_cell
 def SOI220nm_1550nm_TE_STRIP_2x1_MMI(tech: pf.Technology) -> pf.Component:
     """2x1 MMI splitter, TE STRIP waveguide, 1550 nm."""
     mmi = _import_component_with_ports("SOI220nm_1550nm_TE_STRIP_2x1_MMI", tech)
@@ -138,6 +147,7 @@ components["SOI220nm_1550nm_TE_STRIP_2x1_MMI"] = SOI220nm_1550nm_TE_STRIP_2x1_MM
 
 
 ####################################################################
+@_deprecated_cell
 def SOI220nm_1550nm_TE_STRIP_2x2_MMI(tech: pf.Technology) -> pf.Component:
     """2x2 MMI splitter, TE STRIP waveguide, 1550 nm."""
     mmi = _import_component_with_ports("SOI220nm_1550nm_TE_STRIP_2x2_MMI", tech)
@@ -157,6 +167,7 @@ components["SOI220nm_1550nm_TE_STRIP_2x2_MMI"] = SOI220nm_1550nm_TE_STRIP_2x2_MM
 
 
 ####################################################################
+@_deprecated_cell
 def SOI220nm_1550nm_TE_STRIP_90_Degree_Bend(tech: pf.Technology) -> pf.Component:
     """90-degree bend, TE STRIP waveguide, 1550 nm."""
     bend = _import_component_with_ports("SOI220nm_1550nm_TE_STRIP_90_Degree_Bend", tech)
@@ -172,6 +183,7 @@ components["SOI220nm_1550nm_TE_STRIP_90_Degree_Bend"] = SOI220nm_1550nm_TE_STRIP
 
 
 ####################################################################
+@_deprecated_cell
 def SOI220nm_1550nm_TE_STRIP_Grating_Coupler(tech: pf.Technology) -> pf.Component:
     """Grating coupler, TE STRIP waveguide, 1550 nm.
 
@@ -194,6 +206,7 @@ components["SOI220nm_1550nm_TE_STRIP_Grating_Coupler"] = SOI220nm_1550nm_TE_STRI
 
 
 ####################################################################
+@_deprecated_cell
 def SOI220nm_1550nm_TE_STRIP_MZI(tech: pf.Technology) -> pf.Component:
     """Mach-Zehnder interferometer, TE STRIP waveguide, 1550 nm.
 
@@ -209,6 +222,7 @@ components["SOI220nm_1550nm_TE_STRIP_MZI"] = SOI220nm_1550nm_TE_STRIP_MZI
 
 
 ####################################################################
+@_deprecated_cell
 def SOI220nm_1550nm_TE_STRIP_Waveguide(tech: pf.Technology) -> pf.Component:
     """Straight waveguide, TE STRIP, 1550 nm."""
     straight = _import_component_with_ports("SOI220nm_1550nm_TE_STRIP_Waveguide", tech)
@@ -220,6 +234,7 @@ components["SOI220nm_1550nm_TE_STRIP_Waveguide"] = SOI220nm_1550nm_TE_STRIP_Wave
 
 
 ####################################################################
+@_deprecated_cell
 def SOI220nm_1550nm_TE_STRIP_Waveguide_Crossing(tech: pf.Technology) -> pf.Component:
     """Waveguide crossing, TE STRIP, 1550 nm."""
     crossing = _import_component_with_ports("SOI220nm_1550nm_TE_STRIP_Waveguide_Crossing", tech)
@@ -235,6 +250,29 @@ def SOI220nm_1550nm_TE_STRIP_Waveguide_Crossing(tech: pf.Technology) -> pf.Compo
 
 components["SOI220nm_1550nm_TE_STRIP_Waveguide_Crossing"] = (
     SOI220nm_1550nm_TE_STRIP_Waveguide_Crossing
+)
+
+
+####################################################################
+def SOI220_1550nm_TE_strip_apodized_GC_focusing_v1p0(tech: pf.Technology) -> pf.Component:
+    """Apodized focusing grating coupler, TE STRIP waveguide, 1550 nm (SOI220P v1.0).
+
+    Uses the new Cornerstone SOI220P naming convention.  The grating is drawn on
+    GDS layer 6 (``grating_duv``).
+
+    Ports:
+        ``P1``: strip waveguide port (``strip_1550nm``).
+        ``FPvertical_1``: vertical fiber port.
+
+    Note:
+        No S-parameter data is available yet for this cell, so no model is attached.
+
+    """
+    return _import_component_with_ports("SOI220_1550nm_TE_strip_apodized_GC_focusing_v1p0", tech)
+
+
+components["SOI220_1550nm_TE_strip_apodized_GC_focusing_v1p0"] = (
+    SOI220_1550nm_TE_strip_apodized_GC_focusing_v1p0
 )
 
 ###################################################################

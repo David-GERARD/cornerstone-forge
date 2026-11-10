@@ -5,6 +5,10 @@ import pytest
 
 from cornerstone_forge import si_220nm_passive as pdk
 
+# Old-convention cells emit a FutureWarning on every call; silence it outside the
+# dedicated deprecation tests below (pytest.warns still captures it).
+pytestmark = pytest.mark.filterwarnings("ignore:PDK cell .* deprecated:FutureWarning")
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -127,23 +131,23 @@ def test_allband_components(tech):
 # Naming conventions
 # ---------------------------------------------------------------------------
 
-_OBAND_PREFIX = "SOI220nm_1310nm_"
-_CBAND_PREFIX = "SOI220nm_1550nm_"
+_OBAND_PREFIXES = ("SOI220nm_1310nm_", "SOI220_1310nm_")  # (deprecated, SOI220P)
+_CBAND_PREFIXES = ("SOI220nm_1550nm_", "SOI220_1550nm_")  # (deprecated, SOI220P)
 
 
 def test_oband_naming_convention():
     """Test that all O-band names start with the 1310 nm prefix."""
     for name in pdk.oband_component_names:
-        assert name.startswith(_OBAND_PREFIX), (
-            f"O-band component '{name}' does not start with '{_OBAND_PREFIX}'"
+        assert name.startswith(_OBAND_PREFIXES), (
+            f"O-band component '{name}' does not start with any of {_OBAND_PREFIXES}"
         )
 
 
 def test_cband_naming_convention():
     """Test that all C-band names start with the 1550 nm prefix."""
     for name in pdk.cband_component_names:
-        assert name.startswith(_CBAND_PREFIX), (
-            f"C-band component '{name}' does not start with '{_CBAND_PREFIX}'"
+        assert name.startswith(_CBAND_PREFIXES), (
+            f"C-band component '{name}' does not start with any of {_CBAND_PREFIXES}"
         )
 
 
@@ -190,7 +194,9 @@ def test_waveguide_has_two_ports(tech, name: str):
     assert len(c.ports) == 2, f"{name}: expected 2 ports, got {len(c.ports)}"
 
 
-@pytest.mark.parametrize("name", [n for n in pdk.component_names if "Grating_Coupler" in n])
+@pytest.mark.parametrize(
+    "name", [n for n in pdk.component_names if "Grating_Coupler" in n or "_GC" in n]
+)
 def test_grating_coupler_has_one_port(tech, name: str):
     """Test that every grating coupler has one waveguide port and one fiber port."""
     c = pdk.component(name, technology=tech)
@@ -236,3 +242,66 @@ def test_component_model_matches_optical_ports(tech):
             assert model_port_names == optical_ports, (
                 f"{name}: Tidy3D model ports {model_port_names} != optical ports {optical_ports}"
             )
+
+
+# ---------------------------------------------------------------------------
+# Deprecation of the old Cornerstone naming convention (issue #23)
+# ---------------------------------------------------------------------------
+
+_NEW_GC = "SOI220_1550nm_TE_strip_apodized_GC_focusing_v1p0"
+_DEPRECATED_NAMES = [
+    n
+    for n in pdk.component_names
+    if n.startswith(("SOI220nm_", "Cell0_SOI220_Full_1550nm_Packaging_Template"))
+]
+
+
+def test_deprecated_names_non_empty():
+    """Test that the old-convention cells are still available."""
+    assert len(_DEPRECATED_NAMES) > 0
+
+
+@pytest.mark.parametrize("name", _DEPRECATED_NAMES)
+def test_old_naming_convention_cells_warn(tech, name: str):
+    """Test that every cell using the old naming convention emits a deprecation warning."""
+    with pytest.warns(FutureWarning, match="deprecated Cornerstone naming convention"):
+        pdk.component(name, technology=tech)
+
+
+def test_new_apodized_gc_is_registered():
+    """Test that the new SOI220P apodized grating coupler is a C-band component."""
+    assert _NEW_GC in pdk.cband_component_names
+
+
+def test_new_apodized_gc_does_not_warn(tech, recwarn):
+    """Test that the new SOI220P apodized grating coupler is not deprecated."""
+    pdk.component(_NEW_GC, technology=tech)
+    assert not [w for w in recwarn if issubclass(w.category, FutureWarning)]
+
+
+def test_new_apodized_gc_ports_and_layers(tech):
+    """Test the ports and layers of the new apodized grating coupler."""
+    c = pdk.component(_NEW_GC, technology=tech)
+    assert sorted(c.ports) == ["FPvertical_1", "P1"]
+    assert isinstance(c.ports["FPvertical_1"], pf.FiberPort)
+    assert c.ports["P1"].spec == tech.ports["strip_1550nm"]
+    assert c.layers() == {(3, 0), (6, 0)}
+
+
+# ---------------------------------------------------------------------------
+# GDS layer 60 is now layer 6 (issue #23)
+# ---------------------------------------------------------------------------
+
+
+def test_no_component_uses_layer_60(tech):
+    """Test that GDS layer 60 is remapped to layer 6 for every PDK component."""
+    for name in pdk.component_names:
+        c = pdk.component(name, technology=tech)
+        assert (60, 0) not in c.layers(), f"{name} still has geometry on layer (60, 0)"
+
+
+def test_ebl_grating_coupler_remapped_to_layer_6(tech):
+    """Test that the legacy EBL grating coupler (layer 60 in its GDS) is loaded on layer 6."""
+    c = pdk.component("SOI220nm_1550nm_TE_RIB_EBL_Apodised_Grating_Coupler", technology=tech)
+    assert (6, 0) in c.layers()
+    assert (60, 0) not in c.layers()

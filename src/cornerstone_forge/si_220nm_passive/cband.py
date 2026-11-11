@@ -1,5 +1,7 @@
 """C-band (1550 nm) component wrappers for the SI 220nm passive PDK."""
 
+import warnings
+
 import photonforge as pf
 
 from ._utils import _deprecated_cell, _import_component_with_ports, _load_data_model
@@ -278,7 +280,18 @@ def SOI220_1550nm_TE_strip_apodized_GC_focusing_v1p0(tech: pf.Technology) -> pf.
         indicates an insertion loss similar to the linear grating couplers, with a peak
         near 1560 nm (vs. ~1580 nm for the linear gratings).
 
+    Warns:
+        UserWarning: Every time it is called, since no S-parameter model is attached yet.
+
     """
+    warnings.warn(
+        "PDK cell 'SOI220_1550nm_TE_strip_apodized_GC_focusing_v1p0' has no S-parameter model "
+        "yet: Cornerstone has not published its S-parameters. Preliminary characterisation "
+        "indicates an insertion loss similar to the linear grating couplers, with a peak near "
+        "1560 nm (vs. ~1580 nm for the linear gratings).",
+        UserWarning,
+        stacklevel=2,
+    )
     return _import_component_with_ports("SOI220_1550nm_TE_strip_apodized_GC_focusing_v1p0", tech)
 
 

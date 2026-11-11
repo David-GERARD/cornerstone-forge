@@ -10,6 +10,7 @@ from cornerstone_forge import si_220nm_passive as pdk
 pytestmark = [
     pytest.mark.filterwarnings("ignore:PDK cell .* deprecated:FutureWarning"),
     pytest.mark.filterwarnings("ignore:PDK cell .* NOT an equivalent device:UserWarning"),
+    pytest.mark.filterwarnings("ignore:PDK cell .* has no S-parameter model yet:UserWarning"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -324,3 +325,10 @@ def test_no_layer_remap_warning_without_layer_60(tech, recwarn, name: str):
     """Test that cells without layer-60 geometry do not emit the remap warning."""
     pdk.component(name, technology=tech)
     assert not [w for w in recwarn if "NOT an equivalent device" in str(w.message)]
+
+
+def test_new_apodized_gc_warns_no_sparam_model(tech):
+    """Test that the new apodized GC warns that no S-parameter model is attached yet."""
+    with pytest.warns(UserWarning, match="has no S-parameter model yet"):
+        c = pdk.component(_NEW_GC, technology=tech)
+    assert "Data" not in c.models

@@ -62,7 +62,15 @@ components["SOI220nm_1550nm_TE_RIB_90_Degree_Bend"] = SOI220nm_1550nm_TE_RIB_90_
 ####################################################################
 @_deprecated_cell
 def SOI220nm_1550nm_TE_RIB_EBL_Apodised_Grating_Coupler(tech: pf.Technology) -> pf.Component:
-    """EBL apodised grating coupler, TE RIB waveguide, 1550 nm."""
+    """EBL apodised grating coupler, TE RIB waveguide, 1550 nm.
+
+    Warning:
+        This cell was designed for GDS layer 60 (EBL, ~90 nm etch), which Cornerstone no
+        longer offers. It is remapped to layer 6 (DUV, 70 nm etch) on import, which is
+        NOT an equivalent device: it will not perform as designed. Use
+        ``SOI220_1550nm_TE_strip_apodized_GC_focusing_v1p0`` instead.
+
+    """
     # TODO: Add port symmetries once fiber ports are added to the component definition
     return _import_component_with_ports("SOI220nm_1550nm_TE_RIB_EBL_Apodised_Grating_Coupler", tech)
 
@@ -266,6 +274,9 @@ def SOI220_1550nm_TE_strip_apodized_GC_focusing_v1p0(tech: pf.Technology) -> pf.
 
     Note:
         No S-parameter data is available yet for this cell, so no model is attached.
+        Cornerstone expects to publish S-parameters for it; preliminary characterisation
+        indicates an insertion loss similar to the linear grating couplers, with a peak
+        near 1560 nm (vs. ~1580 nm for the linear gratings).
 
     """
     return _import_component_with_ports("SOI220_1550nm_TE_strip_apodized_GC_focusing_v1p0", tech)

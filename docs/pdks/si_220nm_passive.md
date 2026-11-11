@@ -50,7 +50,7 @@ The SOI 220 nm passive process uses a standard Silicon-on-Insulator stack. Nomin
 ## Layer map
 
 !!! warning "GDS layer 60 removed"
-    Layer `(60, 0)` `Si_Etch0_EBL_DF_94nm` (EBL gratings, formerly `grating_ebl`) is no longer part of the Cornerstone SOI220P process. Gratings are defined on layer `(6, 0)` (`grating_duv`). Legacy PDK cells drawn on layer 60 are remapped to layer 6 on import. See [issue #23](https://github.com/David-GERARD/cornerstone-forge/issues/23).
+    Layer `(60, 0)` `Si_Etch0_EBL_DF_94nm` (EBL gratings, formerly `grating_ebl`) is no longer part of the Cornerstone SOI220P process. Gratings are defined on layer `(6, 0)` (`grating_duv`). Legacy PDK cells drawn on layer 60 are remapped to layer 6 on import so they still load, but this is **not** a drop-in replacement: layer 60 was a ~90 nm etch and layer 6 is a 70 nm etch, so the remapped cell will not perform as designed. A `UserWarning` is emitted when this happens. See [issue #23](https://github.com/David-GERARD/cornerstone-forge/issues/23).
 
 | Alias | GDS Layer | Description |
 |-------|-----------|-------------|
@@ -142,7 +142,7 @@ All parameters have process-nominal defaults and can be overridden individually:
 | `SOI220nm_1550nm_TE_RIB_2x1_MMI` | 2×1 MMI | RIB | o1, o2, o3 | `rib_1550nm_TE` |
 | `SOI220nm_1550nm_TE_RIB_2x2_MMI` | 2×2 MMI | RIB | o1, o2, o3, o4 | `rib_1550nm_TE` |
 | `SOI220nm_1550nm_TE_RIB_90_Degree_Bend` | 90° bend | RIB | o1, o2 | `rib_1550nm_TE` |
-| `SOI220nm_1550nm_TE_RIB_EBL_Apodised_Grating_Coupler` | Apodised GC (EBL) | RIB | o1 | `rib_1550nm_TE` |
+| `SOI220nm_1550nm_TE_RIB_EBL_Apodised_Grating_Coupler` | Apodised GC (EBL, ⚠️ layer 60 remapped, not equivalent) | RIB | o1 | `rib_1550nm_TE` |
 | `SOI220nm_1550nm_TE_RIB_Grating_Coupler` | Grating coupler | RIB | o1 | `rib_1550nm_TE` |
 | `SOI220nm_1550nm_TE_RIB_MZI` | MZI with heater | RIB | e1, e2 | `dc` |
 | `SOI220nm_1550nm_TE_RIB_Waveguide` | Straight waveguide | RIB | o1, o2 | `rib_1550nm_TE` |

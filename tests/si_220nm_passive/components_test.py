@@ -7,7 +7,11 @@ from cornerstone_forge import si_220nm_passive as pdk
 
 # Old-convention cells emit a FutureWarning on every call; silence it outside the
 # dedicated deprecation tests below (pytest.warns still captures it).
-pytestmark = pytest.mark.filterwarnings("ignore:PDK cell .* deprecated:FutureWarning")
+pytestmark = [
+    pytest.mark.filterwarnings("ignore:PDK cell .* deprecated:FutureWarning"),
+    pytest.mark.filterwarnings("ignore:PDK cell .* NOT an equivalent device:UserWarning"),
+    pytest.mark.filterwarnings("ignore:PDK cell .* has no S-parameter model yet:UserWarning"),
+]
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -305,3 +309,26 @@ def test_ebl_grating_coupler_remapped_to_layer_6(tech):
     c = pdk.component("SOI220nm_1550nm_TE_RIB_EBL_Apodised_Grating_Coupler", technology=tech)
     assert (6, 0) in c.layers()
     assert (60, 0) not in c.layers()
+
+
+def test_layer_60_remap_warns_not_equivalent(tech):
+    """Test that remapping layer 60 to layer 6 warns that the device is not equivalent."""
+    with pytest.warns(UserWarning, match="NOT an equivalent device"):
+        pdk.component("SOI220nm_1550nm_TE_RIB_EBL_Apodised_Grating_Coupler", technology=tech)
+
+
+@pytest.mark.parametrize(
+    "name",
+    [n for n in pdk.component_names if n != "SOI220nm_1550nm_TE_RIB_EBL_Apodised_Grating_Coupler"],
+)
+def test_no_layer_remap_warning_without_layer_60(tech, recwarn, name: str):
+    """Test that cells without layer-60 geometry do not emit the remap warning."""
+    pdk.component(name, technology=tech)
+    assert not [w for w in recwarn if "NOT an equivalent device" in str(w.message)]
+
+
+def test_new_apodized_gc_warns_no_sparam_model(tech):
+    """Test that the new apodized GC warns that no S-parameter model is attached yet."""
+    with pytest.warns(UserWarning, match="has no S-parameter model yet"):
+        c = pdk.component(_NEW_GC, technology=tech)
+    assert "Data" not in c.models

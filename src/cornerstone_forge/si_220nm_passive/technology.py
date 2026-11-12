@@ -23,7 +23,7 @@ from ._ports import _ports
 
 _MediumType = pft.Medium | dict[Literal["optical", "electrical"], pft.Medium]
 
-technology_version = "0.2.11"
+technology_version = "0.2.12"
 
 
 @pf.parametric_technology

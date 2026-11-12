@@ -15,9 +15,11 @@ _DATA_DIR = pathlib.Path(__file__).parent / "data" / "sparams"
 
 _SPARAM_COL_RE = _re.compile(r"^s_(\d+)@TE0_(\d+)@TE0_(re|im)$")
 
-# GDS layers removed from the Cornerstone process, mapped to their replacement.
-# Layer (60, 0) [Si_Etch0_EBL_DF_94nm] (EBL gratings) was removed from the SOI220P process;
-# gratings are now defined on layer (6, 0) [Si_Etch1_DUV_DF_70nm].
+# GDS layers removed from the Cornerstone process, mapped to their closest replacement.
+# Layer (60, 0) [Si_Etch0_EBL_DF_94nm] (EBL gratings, ~90 nm etch) has been out of
+# circulation since at least MPW46; gratings are now defined on layer (6, 0)
+# [Si_Etch1_DUV_DF_70nm] (70 nm etch). This is NOT a drop-in replacement: the etch depth
+# differs, so a cell designed for layer 60 does not perform as designed on layer 6.
 # See https://github.com/David-GERARD/cornerstone-forge/issues/23
 _LEGACY_LAYER_MAP = {(60, 0): (6, 0)}
 
@@ -63,6 +65,11 @@ def _import_component_with_ports(component_name: str, tech: pf.Technology) -> pf
     Geometry on GDS layers removed from the Cornerstone process is remapped to
     the replacement layer (see ``_LEGACY_LAYER_MAP``); in particular, layer
     ``(60, 0)`` (EBL gratings) is remapped to layer ``(6, 0)`` (DUV gratings).
+    The remap only keeps legacy cells loadable: the etch depths differ (~90 nm vs
+    70 nm), so a :class:`UserWarning` is emitted whenever it applies.
+
+    Warns:
+        UserWarning: If the GDS cell has geometry on a removed layer.
 
     Args:
         component_name: Name of the component, matching the GDS cell name and
@@ -89,8 +96,21 @@ def _import_component_with_ports(component_name: str, tech: pf.Technology) -> pf
     components = pf.load_layout(str(gds_path), technology=tech)
     component = components[component_name]
 
-    # Remap layers removed from the process (e.g. 60 -> 6); no-op when absent.
-    component.remap_layers(_LEGACY_LAYER_MAP, include_dependencies=True)
+    # Remap layers removed from the process (e.g. 60 -> 6).
+    legacy_layers = _LEGACY_LAYER_MAP.keys() & component.layers(include_dependencies=True)
+    if legacy_layers:
+        component.remap_layers(_LEGACY_LAYER_MAP, include_dependencies=True)
+        warnings.warn(
+            f"PDK cell '{component_name}' has geometry on GDS layer(s) {sorted(legacy_layers)}, "
+            "which are no longer offered by Cornerstone; it was remapped to "
+            f"{sorted(_LEGACY_LAYER_MAP[layer] for layer in legacy_layers)}. This is NOT an "
+            "equivalent device: layer 60 was a ~90 nm etch, layer 6 is a 70 nm etch, so the "
+            "fabricated cell will not perform as designed and its S-parameters do not apply. "
+            "Use 'SOI220_1550nm_TE_strip_apodized_GC_focusing_v1p0' instead. "
+            f"See {_DEPRECATION_ISSUE_URL}",
+            UserWarning,
+            stacklevel=2,
+        )
 
     if not yaml_path.exists():
         warnings.warn(

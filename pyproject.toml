@@ -1,6 +1,6 @@
 [project]
 name = "cornerstone-forge"
-version = "0.3.1"
+version = "0.3.2"
 description = "PhotonForge implementation of Cornerstone's silicon photonics PDKs"
 readme = "README.md"
 authors = [
